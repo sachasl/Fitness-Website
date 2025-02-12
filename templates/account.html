@@ -6,46 +6,56 @@
 
 {% block content %}  
 <div class="content">
+    
+    <!-- Account Information Section -->
     <div class="section-box">
         <h1>Account</h1>
         <h3>You are logged in as {{username}}</h3>
-            
-            <form method="POST" action='/account'>
-                <button type="submit" name="action" value="logout">Logout</button>
-            </form>
-            <br>
-            <form method="POST" action='/account'>
-                <button type="submit" name="action" value="delete">Delete account</button>
-            </form>
+        
+        <!-- Logout Button -->
+        <form method="POST" action='/account'>
+            <button type="submit" name="action" value="logout">Logout</button>
+        </form>
+        <br>
+        
+        <!-- Delete Account Button -->
+        <form method="POST" action='/account'>
+            <button type="submit" name="action" value="delete">Delete account</button>
+        </form>
 
+        <!-- Display Additional User Data -->
         {% for user in values %}
             <p>Name: {{user.username}}</p>
         {% endfor %}
     </div>
 
+    <!-- User Details Form -->
     <div class='section-box'>
         <h1>Your Details</h1>
     
         <form method="POST" action="/account">
             <!-- Weight Slider -->
             <h3>Weight</h3>
-            <input type="range" id="weightSlider" name="getWeight" min="40" max="140" step="1" value="90"
+            <input type="range" id="weightSlider" name="getWeight" min="40" max="140" step="1" 
+                   value="{{ weight if weight else 70 }}"
                    oninput="this.nextElementSibling.value = this.value">
-            <output for="weightSlider">90</output> kg
+            <output for="weightSlider">{{ weight if weight else 70 }}</output> kg
             <br>
     
             <!-- Height Slider -->
             <h3>Height</h3>
-            <input type="range" id="heightSlider" name="getHeight" min="1.50" max="2.00" step="0.01" value="1.75" 
+            <input type="range" id="heightSlider" name="getHeight" min="1.50" max="2.00" step="0.01" 
+                   value="{{ height if height else 1.75 }}" 
                    oninput="this.nextElementSibling.value = this.value">
-            <output for="heightSlider">1.75</output> m
+            <output for="heightSlider">{{ height if height else 1.75 }}</output> m
             <br>
     
             <!-- Age Slider -->
             <h3>Age</h3>
-            <input type="range" id="ageSlider" name="getAge" min="16" max="80" step="1" value="48" 
+            <input type="range" id="ageSlider" name="getAge" min="16" max="80" step="1" 
+                   value="{{ age if age else 25 }}" 
                    oninput="this.nextElementSibling.value = this.value">
-            <output for="ageSlider">48</output> Years
+            <output for="ageSlider">{{ age if age else 25 }}</output> Years
             <br>
             <br>
     
@@ -62,6 +72,7 @@
             <button type="submit" name="action" value="updateDetails">Save Changes</button>
         </form>
     
+        <!-- Script to actively change gender toggle indication-->
         <script>
             function updateGenderText() {
                 const genderText = document.getElementById("genderText");
@@ -70,6 +81,7 @@
             }
         </script>        
     
+        <!-- Flash Messages -->
         {% with messages = get_flashed_messages(with_categories=True) %}
             {% if messages %}
                 {% for category, msg in messages %}
@@ -77,6 +89,6 @@
                 {% endfor %}
             {% endif %}
         {% endwith %}
-    </div>
+    </div>    
     
 {% endblock %}

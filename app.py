@@ -97,35 +97,39 @@ def calories():
 # Account page
 @app.route('/account', methods=['POST', 'GET'])
 def account():
+    # Get User session and their database username
     username = session.get('username')
     found_user = User.query.filter_by(username=username).first()
 
-    if not found_user:
-        flash("User not found!", "error")
-        return redirect(url_for('login'))
-
+    # Takes in POST requests (if user presses a button)
     if request.method == 'POST':
         action = request.form.get('action')
 
         # List to store update messages
         messages = []
 
+        # Handles updates to details
         if action == 'updateDetails':
             new_weight = request.form.get('getWeight')
             new_height = request.form.get('getHeight')
             new_age = request.form.get('getAge')
             new_gender = request.form.get('gender', 'male')
 
+            weight_changed = False
+            height_changed = False
+
             # Update user details and add messages to list
-            if new_weight:
+            if new_weight and float(new_weight) != found_user.weight:
                 found_user.weight = float(new_weight)
                 messages.append(f"Weight updated to {new_weight} kg")
+                weight_changed = True
 
-            if new_height:
+            if new_height and float(new_height) != found_user.height:
                 found_user.height = float(new_height)
                 messages.append(f"Height updated to {new_height} m")
+                height_changed = True
 
-            if new_age:
+            if new_age and int(new_age) != found_user.age:
                 found_user.age = int(new_age)
                 messages.append(f"Age updated to {new_age} years")
 
@@ -133,8 +137,8 @@ def account():
                 found_user.gender = new_gender
                 messages.append(f"Gender updated to {new_gender}")
 
-            # Update BMI if weight or height was changed
-            if 'Weight' in messages or 'Height' in messages:
+            # Update BMI only if weight or height was changed
+            if weight_changed or height_changed:
                 found_user.bmi = calculateBMI(found_user.weight, 'kg', found_user.height, 'm')
                 messages.append(f"BMI updated to {found_user.bmi}")
 
@@ -144,13 +148,13 @@ def account():
 
             db.session.commit()
 
-        # Handle Logout
+        # Handles if user logs out
         if action == 'logout':
             flash('You have been logged out!', 'success')
             session.pop('username', None)
             return redirect(url_for('login'))
 
-        # Handle Delete Account
+        # Handles if user deletes their account
         if action == 'delete':
             db.session.delete(found_user)
             db.session.commit()
@@ -158,9 +162,14 @@ def account():
             flash('Account deleted successfully!', 'success')
             return redirect(url_for('login'))
 
-    return render_template('account.html', username=username, gender=found_user.gender)
-
-
+    return render_template(
+        'account.html',
+        username=username,
+        weight=found_user.weight,
+        height=found_user.height,
+        age=found_user.age,
+        gender=found_user.gender
+    )
 
 
 if __name__ == '__main__':
