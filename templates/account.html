@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+
+{% block title %}  
+    <h3>Account</h3>
+{% endblock %}
+
+{% block content %}  
+<div class="content">
+    <div class="section-box">
+        <h1>Account</h1>
+        <h3>You are logged in as {{username}}</h3>
+            
+            <form method="POST" action='/account'>
+                <button type="submit" name="action" value="logout">Logout</button>
+            </form>
+            <br>
+            <form method="POST" action='/account'>
+                <button type="submit" name="action" value="delete">Delete account</button>
+            </form>
+
+        {% for user in values %}
+            <p>Name: {{user.username}}</p>
+        {% endfor %}
+    </div>
+
+    <div class='section-box'>
+        <h1>Your Details</h1>
+    
+        <form method="POST" action="/account">
+            <!-- Weight Slider -->
+            <h3>Weight</h3>
+            <input type="range" id="weightSlider" name="getWeight" min="40" max="140" step="1" value="90"
+                   oninput="this.nextElementSibling.value = this.value">
+            <output for="weightSlider">90</output> kg
+            <br>
+    
+            <!-- Height Slider -->
+            <h3>Height</h3>
+            <input type="range" id="heightSlider" name="getHeight" min="1.50" max="2.00" step="0.01" value="1.75" 
+                   oninput="this.nextElementSibling.value = this.value">
+            <output for="heightSlider">1.75</output> m
+            <br>
+    
+            <!-- Age Slider -->
+            <h3>Age</h3>
+            <input type="range" id="ageSlider" name="getAge" min="16" max="80" step="1" value="48" 
+                   oninput="this.nextElementSibling.value = this.value">
+            <output for="ageSlider">48</output> Years
+            <br>
+            <br>
+    
+            <!-- Gender Toggle -->
+            <label class="switch">
+                <input type="checkbox" id="genderToggle" name="gender" value="female"
+                       {% if gender == 'female' %}checked{% endif %} 
+                       onchange="updateGenderText()">
+                <span class="slider"></span>
+            </label>
+            <p>Selected: <span id="genderText">{% if gender == 'female' %}Female{% else %}Male{% endif %}</span></p>
+    
+            <!-- Single Submit Button -->
+            <button type="submit" name="action" value="updateDetails">Save Changes</button>
+        </form>
+    
+        <script>
+            function updateGenderText() {
+                const genderText = document.getElementById("genderText");
+                const genderToggle = document.getElementById("genderToggle");
+                genderText.textContent = genderToggle.checked ? "Female" : "Male";
+            }
+        </script>        
+    
+        {% with messages = get_flashed_messages(with_categories=True) %}
+            {% if messages %}
+                {% for category, msg in messages %}
+                    <p class="flash-message {{ category }}">{{ msg }}</p>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+    </div>
+    
+{% endblock %}

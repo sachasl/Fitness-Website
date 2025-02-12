@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Fitness App</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    
+
+<body>
+    <nav class="navbar">
+        <ul class="navbar_items">
+            <li>
+                <img src="{{ url_for('static', filename='images/icon.png') }}" height="45" class="navbar_logo"/>
+            </li>
+            <li>
+                <a href=/dashboard class="navbar_links {% if request.path == '/dashboard' %}active{% endif %}">Dashboard</a>
+            </li>
+            <li>
+                <a href="/meals" class="navbar_links {% if request.path == '/meals' %}active{% endif %}">Meals</a>
+            </li>
+            <li>
+                <a href="/goals" class="navbar_links {% if request.path == '/goals' %}active{% endif %}">Goals</a>
+            </li>
+            <li>
+                <a href="/activity" class="navbar_links {% if request.path == '/activity' %}active{% endif %}">Activity</a>
+            </li>
+            <li>
+                <a href="/calories" class="navbar_links {% if request.path == '/calories' %}active{% endif %}">Calories</a>
+            </li>
+            <li>
+                <a href="/account" class="navbar_links {% if request.path == '/account' %}active{% endif %}">Account</a>
+            </li>
+        </ul>
+    </nav>
+
+    <header>
+        {% block title %}  {% endblock %}
+    </header>
+
+    <main>
+        {% block content %}  {% endblock %}
+    </main>
+
+    <footer>
+        {% block footer %}  {% endblock %}
+    </footer>
+</body>
+
+</html>

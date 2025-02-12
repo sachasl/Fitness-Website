@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block title %}  
+    <h2>Dashboard</h2>
+{% endblock %}
+
+{% block content %}
+<div class="content">
+    <div class="section-box">
+        <h1>Your Hub</h1>
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                {% for msg in messages %}
+                    <p>{{msg}}</p>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+    <p>Hello {{username}}!</p>
+    <p>Welcome to your all in one fitness app!</p>
+    </div>
+    <div class="section-box">
+        <h1>Meals</h1>
+    </div>
+
+    <div class="section-box">
+        <h1>Goals</h1>
+        <p>Your BMI at the current time is: {{ user_db.bmi }}</p>
+    </div>
+
+    <div class="section-box">
+        <h1>Activity</h1>
+        <p>Recent Activity</p>
+    </div>
+
+    <div class="section-box">
+        <h1>Calories</h1>
+        <p>Calories Remaining</p>
+    </div>
+
+    <div class="section-box">
+        <h1>Account</h1>
+        <p>You are signed in as: <b>{{username}}</b> !</p>
+    </div>
+</div>
+{% endblock %}
+

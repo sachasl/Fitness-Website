@@ -1,0 +1,99 @@
+/* Full-page background */
+html, body {
+    background: url("./images/background.jpg") no-repeat center center fixed;
+    background-size: cover;
+    height: 100%;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: 'Poppins', sans-serif;
+}
+
+/* Login Container */
+.login-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    width: 100%;
+}
+
+/* Login Box */
+.section-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    border: 0.2rem solid rgba(163, 172, 172, 0.7);
+    padding: 2rem;
+    border-radius: 1rem;
+    background-color: rgba(255, 255, 255, 0.95);
+    width: 100%;
+    max-width: 400rem;
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.2);
+    transition: transform 0.3s ease-in-out;
+    text-align: center;
+}
+
+/* Add hover effect */
+.section-box:hover {
+    transform: scale(1.02);
+}
+
+/* Input Fields */
+input[type="text"], 
+input[type="password"] {
+    width: 90%;
+    padding: 0.75rem;
+    margin: 0.5rem 0;
+    border: 1px solid #ccc;
+    border-radius: 0.5rem;
+    font-size: 1rem;
+    outline: none;
+    transition: border-color 0.3s ease-in-out;
+}
+
+/* Focus effect */
+input[type="text"]:focus {
+    border-color: #2ed2ee;
+}
+
+/* Submit Button */
+input[type="submit"] {
+    width: 90%;
+    padding: 0.75rem;
+    margin-top: 1rem;
+    border: none;
+    border-radius: 0.5rem;
+    background: linear-gradient(45deg, #2ed2ee, #1a98b4);
+    color: white;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease-in-out;
+    font-weight: bold;
+}
+
+input[type="submit"]:hover {
+    background: linear-gradient(45deg, #1a98b4, #2ed2ee);
+    box-shadow: 0 0.2rem 0.5rem rgba(0, 0, 0, 0.2);
+}
+
+/* Flash Messages */
+.flash-message {
+    background-color: lightcoral;
+    color: white;
+    padding: 0.75rem;
+    border-radius: 0.5rem;
+    margin-top: 1rem;
+    width: 90%;
+    text-align: center;
+    font-weight: bold;
+}
+
+/* Responsive Design */
+@media screen and (max-width: 600px) {
+    .section-box {
+        width: 90%;
+        margin: 1rem auto;
+    }
+}
