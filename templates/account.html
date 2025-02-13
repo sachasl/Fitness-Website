@@ -63,32 +63,32 @@
             <h3>Activity Level</h3>
             <div class="activity-level">
                 <label class="radio-button">
-                    <input type="radio" name="exercise_level" value="sedentary"
-                        {% if exercise_level == 'sedentary' %}checked{% endif %}>
+                    <input type="radio" name="exercise_level" value="sedentary" required
+                        {% if user_db.exercise_level == 'sedentary' %}checked{% endif %}>
                     <span class="custom-radio"></span> Sedentary (Little to no exercise)
                 </label>
 
                 <label class="radio-button">
-                    <input type="radio" name="exercise_level" value="lightly_active"
-                        {% if exercise_level == 'lightly_active' %}checked{% endif %}>
+                    <input type="radio" name="exercise_level" value="lightly_active" required
+                        {% if user_db.exercise_level == 'lightly_active' %}checked{% endif %}>
                     <span class="custom-radio"></span> Lightly Active (1-3 days per week)
                 </label>
 
                 <label class="radio-button">
-                    <input type="radio" name="exercise_level" value="moderately_active"
-                        {% if exercise_level == 'moderately_active' %}checked{% endif %}>
+                    <input type="radio" name="exercise_level" value="moderately_active" required
+                        {% if user_db.exercise_level == 'moderately_active' %}checked{% endif %}>
                     <span class="custom-radio"></span> Moderately Active (3-5 days per week)
                 </label>
 
                 <label class="radio-button">
-                    <input type="radio" name="exercise_level" value="very_active"
-                        {% if exercise_level == 'very_active' %}checked{% endif %}>
+                    <input type="radio" name="exercise_level" value="very_active" required
+                        {% if user_db.exercise_level == 'very_active' %}checked{% endif %}>
                     <span class="custom-radio"></span> Very Active (6-7 days per week)
                 </label>
 
                 <label class="radio-button">
-                    <input type="radio" name="exercise_level" value="super_active"
-                        {% if exercise_level == 'super_active' %}checked{% endif %}>
+                    <input type="radio" name="exercise_level" value="super_active" required
+                        {% if user_db.exercise_level == 'super_active' %}checked{% endif %}>
                     <span class="custom-radio"></span> Super Active (Athlete or Intense Training)
                 </label>
             </div>

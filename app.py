@@ -24,6 +24,7 @@ class User(db.Model):
     age = db.Column('age', db.Integer, default=48)
     gender = db.Column('gender', db.String(10), default='male')
     bmr = db.Column('bmr', db.Float)
+    exercise_level = db.Column('exercise_level', db.String(20), default='sedentary')
 
     def __init__(self, username):
         self.username = username
@@ -33,6 +34,7 @@ class User(db.Model):
         self.age = 48
         self.gender = 'male'
         self.bmr = calculateBMR(self.weight, self.height, self.age, self.gender) 
+        self.exercise_level = 'sedentary'
         
         
 # Login page
@@ -104,26 +106,27 @@ def account():
     username = session.get('username')
     found_user = User.query.filter_by(username=username).first()
 
-    # Takes in POST requests (if user presses a button)
+    # Get User session and their database username
     if request.method == 'POST':
         action = request.form.get('action')
-
-        # List to store update messages
         messages = []
 
-        # Handles updates to details
+        # Takes in POST requests (if user presses a button)
         if action == 'updateDetails':
             new_weight = request.form.get('getWeight')
             new_height = request.form.get('getHeight')
             new_age = request.form.get('getAge')
             new_gender = request.form.get('gender', 'male')
-
+            new_exercise_level = request.form.get('exercise_level')
+        
             weight_changed = False
             height_changed = False
             age_changed = False
             gender_changed = False
+            exercise_changed = False
+            bmr_changed = False
 
-            # Update user details in database and add messages to list
+            # Only update if the value has actually changed
             if new_weight and float(new_weight) != found_user.weight:
                 found_user.weight = float(new_weight)
                 messages.append(f"Weight updated to {new_weight} kg")
@@ -139,46 +142,44 @@ def account():
                 messages.append(f"Age updated to {new_age} years")
                 age_changed = True
 
-            if new_gender and new_gender != found_user.gender:
+            if new_gender != found_user.gender:
                 found_user.gender = new_gender
                 messages.append(f"Gender updated to {new_gender}")
                 gender_changed = True
+            
+            if new_exercise_level != found_user.exercise_level:
+                found_user.exercise_level = request.form.get('exercise_level')
+                messages.append(f"Exercise level updated to {found_user.exercise_level}") 
+                exercise_changed = True
 
-            # Update BMI only if weight or height was changed
+            # Update BMI only if weight or height changed
             if weight_changed or height_changed:
                 found_user.bmi = calculateBMI(found_user.weight, found_user.height)
                 messages.append(f"BMI updated to {found_user.bmi}")
 
-            # Update BMR if any affecting attributes change
+            # Update BMR only if weight, height, age, or gender changed
             if weight_changed or height_changed or age_changed or gender_changed:
                 found_user.bmr = calculateBMR(found_user.weight, found_user.height, found_user.age, found_user.gender)
                 messages.append(f"BMR updated to {found_user.bmr}")
+                bmr_changed = True
 
-            # Flash all messages together
+            # Update TDEE only if BMR or exercise level changed
+            if exercise_changed or bmr_changed:
+                found_user.tdee = calculateTDEE(found_user.bmr, found_user.exercise_level)
+                messages.append(f"TDEE updated to {found_user.tdee}")
+
+            # Only flash messages if something actually changed
             if messages:
                 flash(", ".join(messages), "success")
 
             db.session.commit()
-
-        # Handles if user logs out
-        if action == 'logout':
-            flash('You have been logged out!', 'success')
-            session.pop('username', None)
-            return redirect(url_for('login'))
-
-        # Handles if user deletes their account
-        if action == 'delete':
-            db.session.delete(found_user)
-            db.session.commit()
-            session.pop('username', None)
-            flash('Account deleted successfully!', 'success')
-            return redirect(url_for('login'))
 
     return render_template(
         'account.html',
         username=username,
         user_db=found_user
     )
+
 
 
 if __name__ == '__main__':
