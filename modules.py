@@ -26,7 +26,7 @@ def convertWeight(weight, unit):
     return round(weight, 2)
 
 # Calculate BMI
-def calculateBMI(weight, unitW, height, unitH):
+def calculateBMI(weight, height, unitW='kg', unitH='m'):
     if unitW == 'lbs':
         weight = convertWeight(weight, 'lbs')
     if unitH == 'ft':
@@ -46,3 +46,19 @@ def calculateBMR(weight, height, age, gender, unitH='m', unitW='kg'):
     elif gender == 'female':
         bmr = (10 * weight) + (6.25 * height) - (5 * age) - 161
     return round(bmr, 2)
+
+def calculateTDEE(bmr, exericise_level):
+    if exericise_level == 'sedentary':
+        bmr *= 1.2
+    elif exericise_level == 'lightly_active':
+        bmr *= 1.375
+    elif exericise_level == 'moderately_active':
+        bmr *= 1.55
+    elif exericise_level == 'very_active':
+        bmr *= 1.725
+    elif exericise_level == 'super_active':
+        bmr *= 1.9
+    return round(bmr, 2)
+
+def caloricGoals(goal):
+    pass

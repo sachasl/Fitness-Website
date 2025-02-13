@@ -23,14 +23,16 @@ class User(db.Model):
     bmi = db.Column('bmi', db.Float)
     age = db.Column('age', db.Integer, default=48)
     gender = db.Column('gender', db.String(10), default='male')
+    bmr = db.Column('bmr', db.Float)
 
     def __init__(self, username):
         self.username = username
         self.weight = 90
         self.height = 1.75
-        self.bmi = 0
+        self.bmi = calculateBMI(self.weight, self.height)
         self.age = 48
         self.gender = 'male'
+        self.bmr = calculateBMR(self.weight, self.height, self.age, self.gender) 
         
         
 # Login page
@@ -55,6 +57,7 @@ def login():
         # Redirect User to dashboard once logged in
         flash('Login Successful!')
         return redirect(url_for('dashboard'))
+    
     else:
         # If User is already logged in, redirect to dashboard
         if 'username' in session:
@@ -117,8 +120,10 @@ def account():
 
             weight_changed = False
             height_changed = False
+            age_changed = False
+            gender_changed = False
 
-            # Update user details and add messages to list
+            # Update user details in database and add messages to list
             if new_weight and float(new_weight) != found_user.weight:
                 found_user.weight = float(new_weight)
                 messages.append(f"Weight updated to {new_weight} kg")
@@ -132,15 +137,22 @@ def account():
             if new_age and int(new_age) != found_user.age:
                 found_user.age = int(new_age)
                 messages.append(f"Age updated to {new_age} years")
+                age_changed = True
 
             if new_gender and new_gender != found_user.gender:
                 found_user.gender = new_gender
                 messages.append(f"Gender updated to {new_gender}")
+                gender_changed = True
 
             # Update BMI only if weight or height was changed
             if weight_changed or height_changed:
-                found_user.bmi = calculateBMI(found_user.weight, 'kg', found_user.height, 'm')
+                found_user.bmi = calculateBMI(found_user.weight, found_user.height)
                 messages.append(f"BMI updated to {found_user.bmi}")
+
+            # Update BMR if any affecting attributes change
+            if weight_changed or height_changed or age_changed or gender_changed:
+                found_user.bmr = calculateBMR(found_user.weight, found_user.height, found_user.age, found_user.gender)
+                messages.append(f"BMR updated to {found_user.bmr}")
 
             # Flash all messages together
             if messages:
@@ -165,10 +177,7 @@ def account():
     return render_template(
         'account.html',
         username=username,
-        weight=found_user.weight,
-        height=found_user.height,
-        age=found_user.age,
-        gender=found_user.gender
+        user_db=found_user
     )
 
 
