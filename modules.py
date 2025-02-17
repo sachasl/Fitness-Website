@@ -47,6 +47,7 @@ def calculateBMR(weight, height, age, gender, unitH='m', unitW='kg'):
         bmr = (10 * weight) + (6.25 * height) - (5 * age) - 161
     return round(bmr, 2)
 
+# Calculate Total Daily Energy Expenditure
 def calculateTDEE(bmr, exericise_level):
     if exericise_level == 'sedentary':
         bmr *= 1.2
@@ -60,5 +61,36 @@ def calculateTDEE(bmr, exericise_level):
         bmr *= 1.9
     return round(bmr, 2)
 
-def caloricGoals(goal):
-    pass
+def caloricGoals(goal, tdee):
+    if goal == 'maintain':
+        caloriesRequired = tdee
+    elif goal == 'lose':
+        'CalorieDeficit'
+    elif goal == 'gain':
+        'CalorieSurplus'
+    return caloriesRequired
+
+# Calculate Calorie Deficit
+def CalorieDeficit(tdee, deficit):
+    warning = None
+    if deficit == 'mild':
+        caloriesRequired = tdee - 200
+    elif deficit == 'moderate':
+        caloriesRequired = tdee - 300
+    elif deficit == 'extreme':
+        caloriesRequired = tdee - 500
+        warning = 'This is an extreme calorie deficit. Use with caution'
+    return round(caloriesRequired), warning
+
+# Calculate Calorie Surplus
+def calorieSurplus(tdee, surplus):
+    warning = None
+    if surplus == 'mild':
+        caloriesRequired = tdee * 1.05
+    elif surplus == 'moderate':
+        caloriesRequired = tdee * 1.10
+    elif surplus == 'extreme':
+        caloriesRequired = tdee * 1.15
+        warning = 'This is an extreme calorie surplus. Use with caution'
+    return round(caloriesRequired), warning
+
