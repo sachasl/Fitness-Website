@@ -227,8 +227,8 @@ button:hover, input[type="submit"]:hover {
   color: white;
 }
 
-/* Activity Level Section */
-.activity-level {
+/* Activity Level and Fitness Goals Section */
+.activity-level, .fitness-goals {
   display: flex;
   flex-direction: column;
   gap: 0.75rem;

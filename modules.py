@@ -61,15 +61,6 @@ def calculateTDEE(bmr, exericise_level):
         bmr *= 1.9
     return round(bmr, 2)
 
-def caloricGoals(goal, tdee):
-    if goal == 'maintain':
-        caloriesRequired = tdee
-    elif goal == 'lose':
-        'CalorieDeficit'
-    elif goal == 'gain':
-        'CalorieSurplus'
-    return caloriesRequired
-
 # Calculate Calorie Deficit
 def CalorieDeficit(tdee, deficit):
     warning = None
@@ -94,3 +85,13 @@ def calorieSurplus(tdee, surplus):
         warning = 'This is an extreme calorie surplus. Use with caution'
     return round(caloriesRequired), warning
 
+# Calculate the users calorie goals
+def calculateCalorieGoals(tdee, goal, intensity):
+    warning = None
+    if goal == 'maintain':
+        caloriesRequired = tdee
+    elif goal == 'deficit':
+        caloriesRequired, warning = CalorieDeficit(tdee, intensity)
+    elif goal == 'surplus':
+        caloriesRequired, warning = calorieSurplus(tdee, intensity)
+    return round(caloriesRequired), warning

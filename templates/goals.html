@@ -1,9 +1,72 @@
 {% extends "base.html" %}
 
 {% block title %}  
-    <h2>Goals</h2>
+<h1>Goals</h1>
 {% endblock %}
 
 {% block content %} 
+
+<div class="section-box">
+    <h1>Calculate Your Fitness Goals</h1>
+    <form method="POST" action="/goals">
+        
+        <!-- Goal Selection -->
+        <h3>Select Your Goal:</h3>
+        <div class="fitness-goals">
+            <label class="radio-button">
+                <input type="radio" name="goal" value="deficit" required 
+                       {% if goal == 'deficit' %}checked{% endif %}>
+                <span class="custom-radio"></span> Lose Weight (Calorie Deficit)
+            </label>
+
+            <label class="radio-button">
+                <input type="radio" name="goal" value="maintain" required 
+                       {% if goal == 'maintain' %}checked{% endif %}>
+                <span class="custom-radio"></span> Maintain Weight
+            </label>
+
+            <label class="radio-button">
+                <input type="radio" name="goal" value="surplus" required 
+                       {% if goal == 'surplus' %}checked{% endif %}>
+                <span class="custom-radio"></span> Gain Weight (Calorie Surplus)
+            </label>
+        </div>
+
+        <!-- Intensity Selection (Only for Deficit or Surplus) -->
+        <div id="intensity-options" class="fitness-goals" style="display: none;">
+            <h3>Select Intensity:</h3>
+            <label class="radio-button">
+                <input type="radio" name="intensity" value="mild" 
+                       {% if intensity == 'mild' %}checked{% endif %}>
+                <span class="custom-radio"></span> Mild
+            </label><br>
+
+            <label class="radio-button">
+                <input type="radio" name="intensity" value="moderate" 
+                       {% if intensity == 'moderate' %}checked{% endif %}>
+                <span class="custom-radio"></span> Moderate
+            </label><br>
+
+            <label class="radio-button">
+                <input type="radio" name="intensity" value="extreme" 
+                       {% if intensity == 'extreme' %}checked{% endif %}>
+                <span class="custom-radio"></span> Extreme
+            </label><br>
+        </div>
+
+        <!-- Submit Button -->
+        <button type="submit" name="action" value='updateGoals' class="styled-button">Calculate</button>
+    </form>
+</div>
+
+<!-- JavaScript to Show/Hide Intensity Based on Goal Selection -->
+<script>
+    document.querySelectorAll('input[name="goal"]').forEach(goalRadio => {
+        goalRadio.addEventListener('change', function () {
+            const intensityDiv = document.getElementById("intensity-options");
+            intensityDiv.style.display = (this.value === 'deficit' || this.value === 'surplus') ? "block" : "none";
+        });
+    });
+</script>
 
 {% endblock %}
