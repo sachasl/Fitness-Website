@@ -57,6 +57,16 @@
         <!-- Submit Button -->
         <button type="submit" name="action" value='updateGoals' class="styled-button">Calculate</button>
     </form>
+
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=True) %}
+        {% if messages %}
+            {% for category, msg in messages %}
+                <p class="flash-message {{ category }}">{{ msg }}</p>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
 </div>
 
 <!-- JavaScript to Show/Hide Intensity Based on Goal Selection -->

@@ -79,7 +79,7 @@ def login():
 # Dashboard page
 @app.route('/dashboard')
 def dashboard():
-    # Displays hello 'username' on dashboard
+    # Renders dashboard and checks if User is logged in
     if 'username' in session:
         username = session.get('username')
         found_user = User.query.filter_by(username=username).first()
@@ -198,24 +198,24 @@ def account():
             
             if new_exercise_level != found_user.exercise_level:
                 found_user.exercise_level = request.form.get('exercise_level')
-                messages.append(f"Exercise level updated to {found_user.exercise_level}") 
+                messages.append(f"Exercise level updated to {found_user.exercise_level.replace("_", " ").title()}") 
                 exercise_changed = True
 
             # Update BMI only if weight or height changed
             if weight_changed or height_changed:
                 found_user.bmi = calculateBMI(found_user.weight, found_user.height)
-                messages.append(f"BMI updated to {found_user.bmi}")
 
             # Update BMR only if weight, height, age, or gender changed
             if weight_changed or height_changed or age_changed or gender_changed:
                 found_user.bmr = calculateBMR(found_user.weight, found_user.height, found_user.age, found_user.gender)
-                messages.append(f"BMR updated to {found_user.bmr}")
                 bmr_changed = True
 
             # Update TDEE only if BMR or exercise level changed
             if exercise_changed or bmr_changed:
                 found_user.tdee = calculateTDEE(found_user.bmr, found_user.exercise_level)
-                messages.append(f"TDEE updated to {found_user.tdee}")
+
+                # Recalculate caloriesRequired when TDEE changes
+                found_user.caloriesRequired, warning = calculateCalorieGoals(found_user.tdee, found_user.goal, found_user.intensity)
 
             # Only flash messages if something actually changed
             if messages:

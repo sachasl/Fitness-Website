@@ -330,6 +330,36 @@ input:checked + .slider:before {
   transform: translateX(1.5rem);
 }
 
+/* User Details List */
+.user-details {
+  list-style: none;
+  padding: 1rem;
+  margin: 0;
+  background: #f7f7f7;
+  border-radius: 0.5rem;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  max-width: 400px;
+}
+
+/* Style Each List Item */
+.user-details li {
+  padding: 0.75rem;
+  font-size: 1rem;
+  border-bottom: 1px solid #ddd;
+  display: flex;
+  justify-content: space-between;
+}
+
+/* Last Item No Border */
+.user-details li:last-child {
+  border-bottom: none;
+}
+
+/* Highlight Key Information */
+.user-details li strong {
+  color: #2ed2ee;
+}
+
 /* Footer */
 footer {
   display: flex;
