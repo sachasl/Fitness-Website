@@ -1,7 +1,7 @@
 from flask import Flask, redirect, url_for, render_template, request, session, flash
-from datetime import timedelta
 from flask_sqlalchemy import SQLAlchemy
 from modules import *
+from datetime import timedelta, datetime
 import csv
 
 app = Flask(__name__)
@@ -9,7 +9,7 @@ app = Flask(__name__)
 app.secret_key = 'secret'
 app.permanent_session_lifetime = timedelta(days=5)
 # Create database tables
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.sqlite3'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.sqlite3'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 # Create database and its attributes
@@ -17,7 +17,7 @@ db = SQLAlchemy(app)
 
 # Define User class for database
 class User(db.Model):
-    _id = db.Column('id', db.Integer, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(100))
     weight = db.Column(db.Float, default=90)
     height = db.Column(db.Float, default=1.75)
@@ -45,6 +45,10 @@ class User(db.Model):
         self.intensity = None
         self.caloriesRequired = self.tdee
 
+        # Relationship to UserMeals
+        meals = db.relationship('UserMeals', backref='user', lazy=True)
+
+# Define Meal class for database
 class Meal(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     food_name = db.Column(db.String(100), unique=True, nullable=False)
@@ -69,6 +73,18 @@ class Meal(db.Model):
         self.fiber = fiber
         self.carbs = carbs
         self.category = category
+
+        # Relationship to UserMeals
+        users = db.relationship('UserMeals', backref='meal', lazy=True)
+
+
+# UserMeals Table (Linking Users & Meals)
+class UserMeals(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    meal_id = db.Column(db.Integer, db.ForeignKey('meal.id'), nullable=False)
+    quantity = db.Column(db.Float, default=1)  # Number of servings
+    date_added = db.Column(db.DateTime, default=datetime.utcnow)
 
   
         
@@ -278,15 +294,15 @@ def import_nutrition_data(csv_file):
     with open(csv_file, 'r', encoding='utf-8') as file:
         reader = csv.reader(file)
         next(reader)  # Skip header row
+
         for row in reader:
-            # Handle missing values & convert 't' (trace amounts) to 0
             def safe_float(value):
                 try:
                     return float(value) if value not in ['t', '', None] else 0.0
                 except ValueError:
                     return None  # Handle any unexpected errors
 
-            food_name = row[0]  # Food
+            food_name = row[0]  # Food Name
             measure = row[1]  # Measure
             grams = safe_float(row[2])  # Grams
             calories = safe_float(row[3])  # Calories
@@ -297,17 +313,19 @@ def import_nutrition_data(csv_file):
             carbs = safe_float(row[8])  # Carbohydrates
             category = row[9]  # Category
 
-            # Insert into the database
-            meal = Meal(food_name, measure, grams, calories, protein, fat, sat_fat, fiber, carbs, category)
-            db.session.add(meal)
+            # Check if the meal already exists
+            existing_meal = Meal.query.filter_by(food_name=food_name).first()
+            if not existing_meal:
+                # Insert only if it does not exist
+                meal = Meal(food_name, measure, grams, calories, protein, fat, sat_fat, fiber, carbs, category)
+                db.session.add(meal)
 
         db.session.commit()
         print("Data imported successfully!")
+
 
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()
         import_nutrition_data('data/meals.csv')
     app.run(debug=True)
-    
-

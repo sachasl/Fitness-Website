@@ -95,12 +95,3 @@ def calculateCalorieGoals(tdee, goal, intensity):
     elif goal == 'surplus':
         caloriesRequired, warning = calorieSurplus(tdee, intensity)
     return round(caloriesRequired), warning
-
-def calculateMacros(goal, protien, fat, carb):
-    total = protein + fat + carb
-
-    protein = protein / total * 100
-    fat = fat / total * 100
-    carb = carb / total * 100
-
-    return protein, fat, carb
