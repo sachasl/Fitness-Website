@@ -2,6 +2,7 @@ from flask import Flask, redirect, url_for, render_template, request, session, f
 from datetime import timedelta
 from flask_sqlalchemy import SQLAlchemy
 from modules import *
+import csv
 
 app = Flask(__name__)
 # Encyption and lifetime for sessions
@@ -17,18 +18,18 @@ db = SQLAlchemy(app)
 # Define User class for database
 class User(db.Model):
     _id = db.Column('id', db.Integer, primary_key=True)
-    username = db.Column('username', db.String(100))
-    weight = db.Column('weight', db.Float, default=90)
-    height = db.Column('height', db.Float, default=1.75)
-    age = db.Column('age', db.Integer, default=48)
-    gender = db.Column('gender', db.String(10), default='male')
-    bmi = db.Column('bmi', db.Float)
-    bmr = db.Column('bmr', db.Float)
-    tdee = db.Column('tdee', db.Float)
-    exercise_level = db.Column('exercise_level', db.String(20), default='sedentary')
-    goal = db.Column('goal', db.String(20), default='maintain')
-    intensity = db.Column('intensity', db.String(20), default=None)
-    caloriesRequired = db.Column('caloriesRequired', db.Float, default=None)
+    username = db.Column(db.String(100))
+    weight = db.Column(db.Float, default=90)
+    height = db.Column(db.Float, default=1.75)
+    age = db.Column(db.Integer, default=48)
+    gender = db.Column(db.String(10), default='male')
+    bmi = db.Column(db.Float)
+    bmr = db.Column(db.Float)
+    tdee = db.Column(db.Float)
+    exercise_level = db.Column(db.String(20), default='sedentary')
+    goal = db.Column(db.String(20), default='maintain')
+    intensity = db.Column(db.String(20), default=None)
+    caloriesRequired = db.Column(db.Float, default=None)
 
     def __init__(self, username):
         self.username = username
@@ -43,7 +44,33 @@ class User(db.Model):
         self.goal = 'maintain'
         self.intensity = None
         self.caloriesRequired = self.tdee
-        
+
+class Meal(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    food_name = db.Column(db.String(100), unique=True, nullable=False)
+    measure = db.Column(db.String(50), nullable=True)
+    grams = db.Column(db.Float, nullable=True)
+    calories = db.Column(db.Float, nullable=True)
+    protein = db.Column(db.Float, nullable=True)
+    fat = db.Column(db.Float, nullable=True)
+    sat_fat = db.Column(db.Float, nullable=True)
+    fiber = db.Column(db.Float, nullable=True)
+    carbs = db.Column(db.Float, nullable=True)
+    category = db.Column(db.String(50), nullable=True)
+
+    def __init__(self, food_name, measure, grams, calories, protein, fat, sat_fat, fiber, carbs, category):
+        self.food_name = food_name
+        self.measure = measure
+        self.grams = grams
+        self.calories = calories
+        self.protein = protein
+        self.fat = fat
+        self.sat_fat = sat_fat
+        self.fiber = fiber
+        self.carbs = carbs
+        self.category = category
+
+  
         
 # Login page
 @app.route('/login')
@@ -126,6 +153,8 @@ def goals():
 
             # Calculate calorie goal
             caloriesRequired, warning = calculateCalorieGoals(tdee, goal, intensity)
+            if warning:
+                flash(warning, "warning")
 
             # Update the database with the new values
             found_user.goal = goal
@@ -245,10 +274,40 @@ def account():
         user_db=found_user
     )
 
+def import_nutrition_data(csv_file):
+    with open(csv_file, 'r', encoding='utf-8') as file:
+        reader = csv.reader(file)
+        next(reader)  # Skip header row
+        for row in reader:
+            # Handle missing values & convert 't' (trace amounts) to 0
+            def safe_float(value):
+                try:
+                    return float(value) if value not in ['t', '', None] else 0.0
+                except ValueError:
+                    return None  # Handle any unexpected errors
 
+            food_name = row[0]  # Food
+            measure = row[1]  # Measure
+            grams = safe_float(row[2])  # Grams
+            calories = safe_float(row[3])  # Calories
+            protein = safe_float(row[4])  # Protein
+            fat = safe_float(row[5])  # Fat
+            sat_fat = safe_float(row[6])  # Saturated Fat
+            fiber = safe_float(row[7])  # Fiber
+            carbs = safe_float(row[8])  # Carbohydrates
+            category = row[9]  # Category
+
+            # Insert into the database
+            meal = Meal(food_name, measure, grams, calories, protein, fat, sat_fat, fiber, carbs, category)
+            db.session.add(meal)
+
+        db.session.commit()
+        print("Data imported successfully!")
 
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()
+        import_nutrition_data('data/meals.csv')
     app.run(debug=True)
+    
 

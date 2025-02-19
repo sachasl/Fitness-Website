@@ -212,7 +212,7 @@ button:hover, input[type="submit"]:hover {
 /* Warning Message */
 .flash-message.warning {
   background-color: orange;
-  color: #856404;
+  color: #261d02;
 }
 
 /* Info Message */
