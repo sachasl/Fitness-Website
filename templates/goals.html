@@ -69,6 +69,52 @@
 
 </div>
 
+
+
+<div class="section-box">
+    <h1>Macronutrient goals</h1>
+    {% if goal %}
+    <h3>Recommended Macronutrient Ratios:</h3>
+    <ul class="user-list">
+        {% if goal == 'deficit' %}
+            <li><strong>Protein:</strong> 20-30%</li>
+            <li><strong>Fat:</strong> 20-35%</li>
+            <li><strong>Carbohydrates:</strong> 45-60%</li>
+        {% elif goal == 'maintain' %}
+            <li><strong>Protein:</strong> 25-35%</li>
+            <li><strong>Fat:</strong> 20-30%</li>
+            <li><strong>Carbohydrates:</strong> 35-50%</li>
+        {% elif goal == 'surplus' %}
+            <li><strong>Protein:</strong> 25-30%</li>
+            <li><strong>Fat:</strong> 20-25%</li>
+            <li><strong>Carbohydrates:</strong> 45-55%</li>
+        {% endif %}
+    </ul>
+    {% endif %}
+    <br>
+    <form method="POST" action="/goals">
+        <!-- Protein Slider -->
+        <label>Protein (%):
+            <input type="range" id="protein" name="protein" min="20" max="35" value="25" oninput="updateValues()">
+            <span id="proteinValue">25%</span>
+        </label>
+        <br>
+        <!-- Fat Slider -->
+        <label>Fat (%):
+            <input type="range" id="fat" name="fat" min="20" max="35" value="30" oninput="updateValues()">
+            <span id="fatValue">30%</span>
+        </label>
+        <br>
+        <!-- Carbs Slider -->
+        <label>Carbohydrates (%):
+            <input type="range" id="carb" name="carb" min="35" max="60" value="45" oninput="updateValues()">
+            <span id="carbValue">45%</span>
+        </label>
+        <br>
+        <button type="submit" name="action" value='updateMacros' class="styled-button">Save Goals</button>
+    </form>
+</div>
+
 <!-- JavaScript to Show/Hide Intensity Based on Goal Selection -->
 <script>
     document.querySelectorAll('input[name="goal"]').forEach(goalRadio => {
@@ -77,6 +123,12 @@
             intensityDiv.style.display = (this.value === 'deficit' || this.value === 'surplus') ? "block" : "none";
         });
     });
+
+    function updateValues() {
+        document.getElementById("proteinValue").innerText = document.getElementById("protein").value + "%";
+        document.getElementById("fatValue").innerText = document.getElementById("fat").value + "%";
+        document.getElementById("carbValue").innerText = document.getElementById("carb").value + "%";
+    }
 </script>
 
 {% endblock %}

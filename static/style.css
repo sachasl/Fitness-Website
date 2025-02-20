@@ -332,7 +332,7 @@ input:checked + .slider:before {
 }
 
 /* User Details List */
-.user-details {
+.user-list {
   list-style: none;
   padding: 1rem;
   margin: 0;
@@ -343,7 +343,7 @@ input:checked + .slider:before {
 }
 
 /* Style Each List Item */
-.user-details li {
+.user-list li {
   padding: 0.75rem;
   font-size: 1rem;
   border-bottom: 1px solid #ddd;
@@ -352,12 +352,12 @@ input:checked + .slider:before {
 }
 
 /* Last Item No Border */
-.user-details li:last-child {
+.user-list li:last-child {
   border-bottom: none;
 }
 
 /* Highlight Key Information */
-.user-details li strong {
+.user-list li strong {
   color: #2ed2ee;
 }
 
@@ -427,6 +427,41 @@ input:checked + .slider:before {
   border-color: #1a98b4;
   box-shadow: 0 0 0.3125rem rgba(46, 210, 238, 0.5);
   background-color: white;
+}
+
+/* Table Styling */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1rem 0;
+  font-size: 1.1rem;
+  text-align: left;
+  table-layout: fixed;
+  overflow-x: auto;
+  
+}
+
+/* Table Headers & Data Cells */
+th, td {
+  padding: 0.75rem;
+  border-bottom: 2px solid #ddd;
+}
+
+/* Header Styling */
+th {
+  background-color: #2ed2ee;
+  color: white;
+}
+
+/* Alternate Row Coloring */
+tr:nth-child(even) {
+  background-color: #f2f2f2;
+}
+
+/* Hover Effect */
+tr:hover {
+  background-color: #e3f7fc;
+  transition: 0.3s ease-in-out;
 }
 
 /* Footer */

@@ -61,4 +61,37 @@
     }
 </script>
 
+<div class="section-box">
+    <h1>Your Selected Meals</h1>
+
+    {% if user_meals %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Meal Name</th>
+                    <th>Amount (g)</th>
+                    <th>Calories</th>
+                    <th>Protein (g)</th>
+                    <th>Carbs (g)</th>
+                    <th>Fat (g)</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for user_meal, meal in user_meals %}
+                <tr>
+                    <td>{{ meal.food_name }}</td>
+                    <td>{{ user_meal.amount }}</td>
+                    <td>{{ user_meal.calories }}</td>
+                    <td>{{ user_meal.protein }}</td>
+                    <td>{{ user_meal.carbs }}</td>
+                    <td>{{ user_meal.fat }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>No meals selected yet.</p>
+    {% endif %}
+</div>
+
 {% endblock %}

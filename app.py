@@ -29,8 +29,11 @@ class User(db.Model):
     tdee = db.Column(db.Float)
     exercise_level = db.Column(db.String(20), default='sedentary')
     goal = db.Column(db.String(20), default='maintain')
-    intensity = db.Column(db.String(20), default=None)
-    caloriesRequired = db.Column(db.Float, default=None)
+    intensity = db.Column(db.String(20))
+    caloriesRequired = db.Column(db.Float)
+    proteinRequired = db.Column(db.Float)
+    fatRequired = db.Column(db.Float)
+    carbRequired = db.Column(db.Float)
 
     def __init__(self, username):
         self.username = username
@@ -45,6 +48,9 @@ class User(db.Model):
         self.goal = 'maintain'
         self.intensity = None
         self.caloriesRequired = self.tdee
+        proteinRequired = self.proteinRequired
+        fatRequired = self.fatRequired
+        carbRequired = self.carbRequired
 
     # Relationship to UserMeals
     meals = db.relationship('UserMeals', backref='user', lazy=True)
@@ -196,7 +202,7 @@ def goals():
     # Default values
     goal = found_user.goal if found_user.goal else None
     intensity = found_user.intensity if found_user.intensity else None
-    caloriesRequired = None
+    caloriesRequired = found_user.caloriesRequired if found_user.caloriesRequired else None
     warning = None
 
     if request.method =='POST':
@@ -231,8 +237,32 @@ def goals():
 
             # Flash success message
             flash(f"Goal updated to {goal} with {intensity if intensity else 'no'} intensity.", "success")
+            return redirect(url_for('goals'))
+        
+        if action == 'updateMacros':
+            protein_ratio = int(request.form.get('protein'))
+            fat_ratio = int(request.form.get('fat'))
+            carb_ratio = int(request.form.get('carb'))
+            
 
-    return render_template('goals.html')
+            # Ensure the ratios sum up to 100%
+            if protein_ratio + fat_ratio + carb_ratio != 100:
+                flash("The total of protein, fat, and carbohydrates must equal 100%.", "error")
+                return redirect(url_for('goals'))
+            
+            # calculate the macronutrients in calories
+            protein = caloriesRequired * (protein_ratio / 100)
+            fat = caloriesRequired * (fat_ratio / 100)
+            carb = caloriesRequired * (carb_ratio / 100)
+            # Store macronutrient ratios in the database
+            found_user.proteinRequired = protein
+            found_user.fatRequired = fat
+            found_user.carbRequired = carb
+            db.session.commit()
+            flash("Macronutrients updated successfully!", "success")
+            return redirect(url_for('goals'))
+
+    return render_template('goals.html', goal=goal)
 
 # Activity page
 @app.route('/activity')
