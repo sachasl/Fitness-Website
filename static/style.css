@@ -107,6 +107,7 @@ header {
   width: 40%;
   box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.2);
   transition: transform 0.3s ease-in-out;
+  overflow: hidden;
 }
 
 /* Content Section */
@@ -358,6 +359,74 @@ input:checked + .slider:before {
 /* Highlight Key Information */
 .user-details li strong {
   color: #2ed2ee;
+}
+
+/* Search Input Field */
+#meal-search {
+  width: 50%;
+  padding: 0.625rem;
+  margin: 0.625rem 0;
+  border: 0.125rem solid #2ed2ee;
+  border-radius: 0.3125rem;
+  font-size: 1rem;
+  outline: none;
+  transition: 0.3s ease-in-out;
+}
+
+#meal-search:focus {
+  border-color: #1a98b4;
+  box-shadow: 0 0 0.3125rem rgba(46, 210, 238, 0.5);
+}
+
+/* Select Dropdown */
+#meal_id {
+  width: 50%;
+  padding: 0.75rem;
+  border: 0.125rem solid #2ed2ee;
+  border-radius: 0.3125rem;
+  font-size: 1rem;
+  background: #ffffff;
+  appearance: none;
+  cursor: pointer;
+  outline: none;
+  transition: 0.3s ease-in-out;
+}
+
+#meal_id:hover {
+  border-color: #1a98b4;
+}
+
+/* Quantity Input */
+#quantity {
+  width: 50%;
+  padding: 0.625rem;
+  margin: 0.625rem 0;
+  border: 0.125rem solid #2ed2ee;
+  border-radius: 0.3125rem;
+  font-size: 1rem;
+  outline: none;
+}
+
+/* Style for Amount Input */
+#amount {
+  width: 50%;
+  padding: 0.625rem;
+  margin-top: 0.5rem;
+  border: 0.125rem solid #2ed2ee;
+  border-radius: 0.3125rem;
+  font-size: 1rem;
+  outline: none;
+  transition: 0.3s ease-in-out;
+  text-align: center;
+  font-weight: bold;
+  background-color: #f8f9fa;
+}
+
+/* Amount Input Focus Effect */
+#amount:focus {
+  border-color: #1a98b4;
+  box-shadow: 0 0 0.3125rem rgba(46, 210, 238, 0.5);
+  background-color: white;
 }
 
 /* Footer */

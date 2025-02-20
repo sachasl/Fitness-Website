@@ -2,7 +2,7 @@ from flask import Flask, redirect, url_for, render_template, request, session, f
 from flask_sqlalchemy import SQLAlchemy
 from modules import *
 from datetime import timedelta, datetime
-import csv
+from flask_migrate import Migrate
 
 app = Flask(__name__)
 # Encyption and lifetime for sessions
@@ -14,6 +14,7 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 # Create database and its attributes
 db = SQLAlchemy(app)
+migrate = Migrate(app, db)
 
 # Define User class for database
 class User(db.Model):
@@ -45,8 +46,8 @@ class User(db.Model):
         self.intensity = None
         self.caloriesRequired = self.tdee
 
-        # Relationship to UserMeals
-        meals = db.relationship('UserMeals', backref='user', lazy=True)
+    # Relationship to UserMeals
+    meals = db.relationship('UserMeals', backref='user', lazy=True)
 
 # Define Meal class for database
 class Meal(db.Model):
@@ -74,19 +75,29 @@ class Meal(db.Model):
         self.carbs = carbs
         self.category = category
 
-        # Relationship to UserMeals
-        users = db.relationship('UserMeals', backref='meal', lazy=True)
+    # Relationship to UserMeals
+    users = db.relationship('UserMeals', backref='meal', lazy=True)
 
-
-# UserMeals Table (Linking Users & Meals)
 class UserMeals(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     meal_id = db.Column(db.Integer, db.ForeignKey('meal.id'), nullable=False)
-    quantity = db.Column(db.Float, default=1)  # Number of servings
+    amount = db.Column(db.Float, default=100)  # Number of servings
+    calories = db.Column(db.Float, nullable=False)
+    protein = db.Column(db.Float, nullable=False)
+    carbs = db.Column(db.Float, nullable=False)
+    fat = db.Column(db.Float, nullable=False)
     date_added = db.Column(db.DateTime, default=datetime.utcnow)
 
-  
+    def __init__(self, user_id, meal_id, amount, calories, protein, carbs, fat):
+        self.user_id = user_id
+        self.meal_id = meal_id
+        self.amount = amount
+        self.calories = calories
+        self.protein = protein
+        self.carbs = carbs
+        self.fat = fat
+        self.date_added = datetime.utcnow()  # Ensure correct timestamp
         
 # Login page
 @app.route('/login')
@@ -131,9 +142,49 @@ def dashboard():
         return redirect(url_for('login')) 
 
 # Meals page
-@app.route('/meals')
+@app.route('/meals', methods=['POST', 'GET'])
 def meals():
-    return render_template('meals.html')
+    # Get User session
+    username = session.get('username')
+    found_user = User.query.filter_by(username=username).first()
+
+    # Get all meals from the database
+    meals_list = Meal.query.all()
+
+    # Get meals already chosen by the user
+    user_meals = db.session.query(UserMeals, Meal).join(Meal).filter(UserMeals.user_id == found_user.id).all()
+
+    if request.method == 'POST':
+        meal_id = request.form.get('meal_id')  # Get selected meal ID
+        amount = float(request.form.get('amount', 100)) # Get amount in grams
+
+        if meal_id:
+            selected_meal = Meal.query.get(meal_id)
+
+            # Ensure valid meal selection
+            if selected_meal and selected_meal.grams > 0:
+                # Calculate macronutrients based on the selected amount
+                calories = round((selected_meal.calories / selected_meal.grams) * amount, 2)
+                protein = round((selected_meal.protein / selected_meal.grams) * amount, 2)
+                carbs = round((selected_meal.carbs / selected_meal.grams) * amount, 2)
+                fat = round((selected_meal.fat / selected_meal.grams) * amount, 2)
+            else:
+                flash("Meal data is missing or invalid. Please try again.", "error")
+                return redirect(url_for('meals'))
+
+            # Save meal selection to UserMeals table
+            user_meal = UserMeals(user_id=found_user.id, meal_id=selected_meal.id, amount=amount, calories=calories, protein=protein, carbs=carbs, fat=fat)
+            db.session.add(user_meal)
+            db.session.commit()
+
+            flash(f"Added {amount}g of {selected_meal.food_name} ({calories:.2f} kcal, {protein:.2f}g protein, {carbs:.2f}g carbs, {fat:.2f}g fat) to your meals!", "success")
+            return redirect(url_for('meals'))  # Refresh the page
+
+        else:
+            flash("Please select a meal before submitting.", "error")
+
+    return render_template('meals.html', meals_list=meals_list, user_meals=user_meals, user_db=found_user)
+
 
 # Goals page
 @app.route('/goals', methods=['POST', 'GET'])
@@ -243,7 +294,7 @@ def account():
             
             if new_exercise_level != found_user.exercise_level:
                 found_user.exercise_level = request.form.get('exercise_level')
-                messages.append(f"Exercise level updated to {found_user.exercise_level.replace("_", " ").title()}") 
+                messages.append(f"Exercise level updated to {found_user.exercise_level.replace("_", " ").title()}")
                 exercise_changed = True
 
             # Update BMI only if weight or height changed
@@ -290,42 +341,7 @@ def account():
         user_db=found_user
     )
 
-def import_nutrition_data(csv_file):
-    with open(csv_file, 'r', encoding='utf-8') as file:
-        reader = csv.reader(file)
-        next(reader)  # Skip header row
-
-        for row in reader:
-            def safe_float(value):
-                try:
-                    return float(value) if value not in ['t', '', None] else 0.0
-                except ValueError:
-                    return None  # Handle any unexpected errors
-
-            food_name = row[0]  # Food Name
-            measure = row[1]  # Measure
-            grams = safe_float(row[2])  # Grams
-            calories = safe_float(row[3])  # Calories
-            protein = safe_float(row[4])  # Protein
-            fat = safe_float(row[5])  # Fat
-            sat_fat = safe_float(row[6])  # Saturated Fat
-            fiber = safe_float(row[7])  # Fiber
-            carbs = safe_float(row[8])  # Carbohydrates
-            category = row[9]  # Category
-
-            # Check if the meal already exists
-            existing_meal = Meal.query.filter_by(food_name=food_name).first()
-            if not existing_meal:
-                # Insert only if it does not exist
-                meal = Meal(food_name, measure, grams, calories, protein, fat, sat_fat, fiber, carbs, category)
-                db.session.add(meal)
-
-        db.session.commit()
-        print("Data imported successfully!")
-
-
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()
-        import_nutrition_data('data/meals.csv')
     app.run(debug=True)

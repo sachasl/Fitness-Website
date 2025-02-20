@@ -6,4 +6,59 @@
 
 {% block content %} 
 
+<div class="section-box">
+    <h1>Select Your Meals</h1>
+    <!-- Form to add meal -->
+    <form method="POST" action="/meals">
+        
+        <!-- Searchable Dropdown -->
+        <label for="meal-search">Filter to select a Meal:</label>
+        <input type="text" id="meal-search" onkeyup="filterMeals()" placeholder="Type to search...">
+        <br>
+        <!-- Meal Dropdown -->
+        <label for="meal_id">Select a Meal:</label>
+        <select name="meal_id" id="meal_id" required>
+            <option value="" disabled selected>Choose a meal</option>
+            {% for meal in meals_list %}
+                <option value="{{ meal.id }}">{{ meal.food_name }} - {{ meal.calories }} kcal per {{meal.grams}} grams</option>
+            {% endfor %}
+        </select>
+        <br>
+        <!-- Amount Input Field -->
+        <label for="amount">Enter Amount (grams):</label>
+        <input type="number" name="amount" id="amount" min="1" value="100" required>
+
+        <button type="submit" class="styled-button">Add Meal</button>
+    </form>
+
+    <!-- Display Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=True) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <p class="flash-message {{ category }}">{{ message }}</p>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+</div>
+
+<!-- JavaScript for Searchable Dropdown -->
+<script>
+    function filterMeals() {
+        var input, filter, select, options, option, i;
+        input = document.getElementById("meal-search");
+        filter = input.value.toLowerCase();
+        select = document.getElementById("meal_id");
+        options = select.getElementsByTagName("option");
+
+        for (i = 1; i < options.length; i++) { // Skip first disabled option
+            option = options[i];
+            if (option.textContent.toLowerCase().includes(filter)) {
+                option.style.display = "";
+            } else {
+                option.style.display = "none";
+            }
+        }
+    }
+</script>
+
 {% endblock %}
