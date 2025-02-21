@@ -31,6 +31,9 @@ class User(db.Model):
     goal = db.Column(db.String(20), default='maintain')
     intensity = db.Column(db.String(20))
     caloriesRequired = db.Column(db.Float)
+    proteinRatio = db.Column(db.Float)
+    fatRatio = db.Column(db.Float)
+    carbRatio = db.Column(db.Float)
     proteinRequired = db.Column(db.Float)
     fatRequired = db.Column(db.Float)
     carbRequired = db.Column(db.Float)
@@ -48,6 +51,9 @@ class User(db.Model):
         self.goal = 'maintain'
         self.intensity = None
         self.caloriesRequired = self.tdee
+        proteinRatio = self.proteinRatio
+        fatRatio = self.fatRatio
+        carbRatio = self.carbRatio
         proteinRequired = self.proteinRequired
         fatRequired = self.fatRequired
         carbRequired = self.carbRequired
@@ -243,23 +249,34 @@ def goals():
             protein_ratio = int(request.form.get('protein'))
             fat_ratio = int(request.form.get('fat'))
             carb_ratio = int(request.form.get('carb'))
-            
+
+            # Update the database with the macro ratio if need to recalulate when changing calories
+            found_user.proteinRatio = protein_ratio
+            found_user.fatRatio = fat_ratio
+            found_user.carbRatio = carb_ratio
 
             # Ensure the ratios sum up to 100%
             if protein_ratio + fat_ratio + carb_ratio != 100:
                 flash("The total of protein, fat, and carbohydrates must equal 100%.", "error")
                 return redirect(url_for('goals'))
-            
-            # calculate the macronutrients in calories
-            protein = caloriesRequired * (protein_ratio / 100)
-            fat = caloriesRequired * (fat_ratio / 100)
-            carb = caloriesRequired * (carb_ratio / 100)
-            # Store macronutrient ratios in the database
-            found_user.proteinRequired = protein
-            found_user.fatRequired = fat
-            found_user.carbRequired = carb
+
+            # Check if caloriesRequired exists
+            if not caloriesRequired or caloriesRequired == 0:
+                flash("Calorie requirement not set. Please update your goal first.", "error")
+                return redirect(url_for('goals'))
+
+            # Convert Calories to Grams
+            protein_grams = round((caloriesRequired * (protein_ratio / 100)) / 4)
+            fat_grams = round((caloriesRequired * (fat_ratio / 100)) / 9)
+            carb_grams = round((caloriesRequired * (carb_ratio / 100)) / 4)
+
+            # Store macronutrient values in grams in the database
+            found_user.proteinRequired = protein_grams
+            found_user.fatRequired = fat_grams
+            found_user.carbRequired = carb_grams
             db.session.commit()
-            flash("Macronutrients updated successfully!", "success")
+
+            flash(f"Macronutrient goals updated: {protein_grams:.1f}g protein, {fat_grams:.1f}g fat, {carb_grams:.1f}g carbs", "success")
             return redirect(url_for('goals'))
 
     return render_template('goals.html', goal=goal)
@@ -324,7 +341,7 @@ def account():
             
             if new_exercise_level != found_user.exercise_level:
                 found_user.exercise_level = request.form.get('exercise_level')
-                messages.append(f"Exercise level updated to {found_user.exercise_level.replace("_", " ").title()}")
+                messages.append(f"Exercise level updated to {found_user.exercise_level.replace('_', ' ').title()}")
                 exercise_changed = True
 
             # Update BMI only if weight or height changed
@@ -343,6 +360,17 @@ def account():
                 # Recalculate caloriesRequired when TDEE changes
                 found_user.caloriesRequired, warning = calculateCalorieGoals(found_user.tdee, found_user.goal, found_user.intensity)
 
+                # Retrieve the macro ratios from the database
+                protein_ratio = found_user.proteinRatio if found_user.proteinRatio else 25
+                fat_ratio = found_user.fatRatio if found_user.fatRatio else 30
+                carb_ratio = found_user.carbRatio if found_user.carbRatio else 45
+
+
+                # Convert Calories to Grams and store values to the database
+                found_user.proteinRequired = round((found_user.caloriesRequired * (protein_ratio / 100)) / 4)
+                found_user.fatRequired = round((found_user.caloriesRequired * (fat_ratio / 100)) / 9)
+                found_user.carbRequired = round((found_user.caloriesRequired * (carb_ratio / 100)) / 4)
+                
             # Only flash messages if something actually changed
             if messages:
                 flash(", ".join(messages), "success")

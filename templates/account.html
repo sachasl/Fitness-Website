@@ -13,19 +13,24 @@
         <h3>You are logged in as {{username}}</h3>
 
         <!-- Display User Details -->
-         <h3>Your Details</h3>
+        <h3>Your Details</h3>
         <ul class="user-list">
             <li><strong>Weight:</strong> {{ user_db.weight if user_db.weight else 90 }} kg</li>
             <li><strong>Height:</strong> {{ user_db.height if user_db.height else 1.75 }} m</li>
             <li><strong>Age:</strong> {{ user_db.age if user_db.age else 48 }} years</li>
             <li><strong>Gender:</strong> {{ user_db.gender if user_db.gender else 'male' }}</li>
             <li><strong>BMI:</strong> {{ user_db.bmi if user_db.bmi else 'Not Calculated' }}</li>
-            <li><strong>BMR:</strong> {{ user_db.bmr if user_db.bmr else 'Not Calculated' }} kcal/day</li>
             <li><strong>Activity Level:</strong> {{ user_db.exercise_level.replace("_", " ").title() if user_db.exercise_level else 'Not Set' }}</li>
-            <li><strong>TDEE:</strong> {{ user_db.tdee if user_db.tdee else 'Not Calculated' }} kcal/day</li>
             <li><strong>Goal:</strong> {{ user_db.goal if user_db.goal else 'Not Set' }}</li>
             <li><strong>Intensity:</strong> {{ user_db.intensity if user_db.intensity else 'Not Set' }}</li>
+        </ul>
+
+        <h3>Your Goals</h3>
+        <ul class="user-list">
             <li><strong>Calorie Requirement:</strong> {{ user_db.caloriesRequired if user_db.caloriesRequired else 'Not Set' }} kcal/day</li>
+            <li><strong>Protein Requirement:</strong> {{ user_db.proteinRequired if user_db.proteinRequired else 'Not Set' }} g/day</li>
+            <li><strong>Carbohydrate Requirement:</strong> {{ user_db.carbRequired if user_db.carbRequired else 'Not Set' }} g/day</li>
+            <li><strong>Fat Requirement:</strong> {{ user_db.fatRequired if user_db.fatRequired else 'Not Set' }} g/day</li>
         </ul>
 
         <!-- Logout Button -->

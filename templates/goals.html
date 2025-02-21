@@ -111,6 +111,10 @@
             <span id="carbValue">45%</span>
         </label>
         <br>
+        <!-- Total Macronutrient Percentage -->
+        <p><strong>Total:</strong> <span id="totalValue">100%</span></p>
+        <p id="errorMessage" style="color: red; font-weight: bold; display: none;">Total must equal 100%</p>
+        <br>
         <button type="submit" name="action" value='updateMacros' class="styled-button">Save Goals</button>
     </form>
 </div>
@@ -125,10 +129,35 @@
     });
 
     function updateValues() {
-        document.getElementById("proteinValue").innerText = document.getElementById("protein").value + "%";
-        document.getElementById("fatValue").innerText = document.getElementById("fat").value + "%";
-        document.getElementById("carbValue").innerText = document.getElementById("carb").value + "%";
+        let protein = parseInt(document.getElementById("protein").value);
+        let fat = parseInt(document.getElementById("fat").value);
+        let carb = parseInt(document.getElementById("carb").value);
+
+        // Update individual values
+        document.getElementById("proteinValue").innerText = protein + "%";
+        document.getElementById("fatValue").innerText = fat + "%";
+        document.getElementById("carbValue").innerText = carb + "%";
+
+        // Calculate total
+        let total = protein + fat + carb;
+        let totalValueElement = document.getElementById("totalValue");
+        let errorMessage = document.getElementById("errorMessage");
+
+        // Update total display
+        totalValueElement.innerText = total + "%";
+
+        // Check if total is exactly 100%
+        if (total === 100) {
+            totalValueElement.style.color = "green";
+            errorMessage.style.display = "none";
+        } else {
+            totalValueElement.style.color = "red";
+            errorMessage.style.display = "block";
+        }
     }
+
+    // Initialize correct display on page load
+    updateValues();
 </script>
 
 {% endblock %}
