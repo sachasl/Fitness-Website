@@ -112,3 +112,18 @@ def check_goal_achievement(user):
     if abs(user.carbRemaining) <= macro_margin:
         messages.append("🍞 Congrats! You've hit your carb goal!")
     return messages
+
+# Check if user has set up their account details
+def user_details_complete(user):
+    return all([
+        user.weight is not None,
+        user.height is not None,
+        user.age is not None,
+        user.gender is not None,
+        user.exercise_level is not None,
+        user.caloriesRequired is not None,
+        user.proteinRequired is not None,
+        user.fatRequired is not None,
+        user.carbRequired is not None
+    ])
+
