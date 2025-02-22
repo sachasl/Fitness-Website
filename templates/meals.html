@@ -41,6 +41,23 @@
     {% endwith %}
 </div>
 
+<div class="section-box">
+    <h2>Today's Remaining Macros</h2>
+    <ul class="user-list">
+        <li><strong>Calories Remaining:</strong> {{ user_db.caloriesRemaining }} kcal</li>
+        <li><strong>Protein Remaining:</strong> {{ user_db.proteinRemaining }} g</li>
+        <li><strong>Fat Remaining:</strong> {{ user_db.fatRemaining }} g</li>
+        <li><strong>Carbs Remaining:</strong> {{ user_db.carbRemaining }} g</li>
+    </ul>
+
+    <!-- Display Goal Achievement Messages -->
+    {% if goal_messages %}
+        {% for message in goal_messages %}
+            <p class="flash-message success">{{ message }}</p>
+        {% endfor %}
+    {% endif %}
+</div>
+
 <!-- JavaScript for Searchable Dropdown -->
 <script>
     function filterMeals() {

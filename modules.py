@@ -95,3 +95,20 @@ def calculateCalorieGoals(tdee, goal, intensity):
     elif goal == 'surplus':
         caloriesRequired, warning = calorieSurplus(tdee, intensity)
     return round(caloriesRequired), warning
+
+# Checks if the user has met their macro goals and returns a message if they have.
+def check_goal_achievement(user):
+    messages = []
+    # Margin for goal completion
+    calorie_margin = 30
+    macro_margin = 5
+
+    if abs(user.caloriesRemaining) <= calorie_margin:
+        messages.append("🎉 You've reached your calorie goal for today!")
+    if abs(user.proteinRemaining) <= macro_margin:
+        messages.append("💪 Great job! You've hit your protein goal!")
+    if abs(user.fatRemaining) <= macro_margin:
+        messages.append("🥑 Awesome! You've met your fat intake goal!")
+    if abs(user.carbRemaining) <= macro_margin:
+        messages.append("🍞 Congrats! You've hit your carb goal!")
+    return messages

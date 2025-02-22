@@ -1,7 +1,7 @@
 from flask import Flask, redirect, url_for, render_template, request, session, flash
 from flask_sqlalchemy import SQLAlchemy
 from modules import *
-from datetime import timedelta, datetime
+from datetime import timedelta, datetime, timezone
 from flask_migrate import Migrate
 
 app = Flask(__name__)
@@ -37,6 +37,11 @@ class User(db.Model):
     proteinRequired = db.Column(db.Float)
     fatRequired = db.Column(db.Float)
     carbRequired = db.Column(db.Float)
+    caloriesRemaining = db.Column(db.Float)
+    proteinRemaining = db.Column(db.Float)
+    fatRemaining = db.Column(db.Float)
+    carbRemaining = db.Column(db.Float)
+    last_reset = db.Column(db.Date, default=lambda: datetime.now(timezone.utc).date())
 
     def __init__(self, username):
         self.username = username
@@ -58,8 +63,30 @@ class User(db.Model):
         fatRequired = self.fatRequired
         carbRequired = self.carbRequired
 
+    def reset_macros(self):
+        today = datetime.now(timezone.utc).date()
+
+        # Ensure macros are initialized for new users
+        if self.caloriesRemaining is None or self.proteinRemaining is None or self.fatRemaining is None or self.carbRemaining is None:
+            self.caloriesRemaining = self.caloriesRequired
+            self.proteinRemaining = self.proteinRequired
+            self.fatRemaining = self.fatRequired
+            self.carbRemaining = self.carbRequired
+            self.last_reset = today
+            db.session.commit()
+            return
+        
+        # Reset the user goals every day
+        if self.last_reset != today:
+            self.caloriesRemaining = self.caloriesRequired
+            self.proteinRemaining = self.proteinRequired
+            self.fatRemaining = self.fatRequired
+            self.carbRemaining = self.carbRequired
+            self.last_reset = today
+            db.session.commit()
+
     # Relationship to UserMeals
-    meals = db.relationship('UserMeals', backref='user', lazy=True)
+    meals = db.relationship('UserMeals', backref='user', lazy=True, cascade="all, delete-orphan")
 
 # Define Meal class for database
 class Meal(db.Model):
@@ -99,7 +126,7 @@ class UserMeals(db.Model):
     protein = db.Column(db.Float, nullable=False)
     carbs = db.Column(db.Float, nullable=False)
     fat = db.Column(db.Float, nullable=False)
-    date_added = db.Column(db.DateTime, default=datetime.utcnow)
+    date_added = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
 
     def __init__(self, user_id, meal_id, amount, calories, protein, carbs, fat):
         self.user_id = user_id
@@ -109,7 +136,6 @@ class UserMeals(db.Model):
         self.protein = protein
         self.carbs = carbs
         self.fat = fat
-        self.date_added = datetime.utcnow()  # Ensure correct timestamp
         
 # Login page
 @app.route('/login')
@@ -160,11 +186,25 @@ def meals():
     username = session.get('username')
     found_user = User.query.filter_by(username=username).first()
 
+    # Reset macros if the day has changed
+    found_user.reset_macros()
+
     # Get all meals from the database
     meals_list = Meal.query.all()
 
-    # Get meals already chosen by the user
-    user_meals = db.session.query(UserMeals, Meal).join(Meal).filter(UserMeals.user_id == found_user.id).all()
+    # Get today's date in UTC
+    today = datetime.now(timezone.utc).date()
+
+    # Get meals already chosen by the user **TODAY**
+    user_meals = (
+        db.session.query(UserMeals, Meal)
+        .join(Meal)
+        .filter(UserMeals.user_id == found_user.id)
+        .filter(UserMeals.date_added >= today)  # Filter meals added today
+        .all()
+    )
+
+    goal_messages = check_goal_achievement(found_user)
 
     if request.method == 'POST':
         meal_id = request.form.get('meal_id')  # Get selected meal ID
@@ -176,26 +216,42 @@ def meals():
             # Ensure valid meal selection
             if selected_meal and selected_meal.grams > 0:
                 # Calculate macronutrients based on the selected amount
-                calories = round((selected_meal.calories / selected_meal.grams) * amount, 2)
-                protein = round((selected_meal.protein / selected_meal.grams) * amount, 2)
-                carbs = round((selected_meal.carbs / selected_meal.grams) * amount, 2)
-                fat = round((selected_meal.fat / selected_meal.grams) * amount, 2)
+                calories = round((selected_meal.calories / selected_meal.grams) * amount)
+                protein = round((selected_meal.protein / selected_meal.grams) * amount)
+                carbs = round((selected_meal.carbs / selected_meal.grams) * amount)
+                fat = round((selected_meal.fat / selected_meal.grams) * amount)
+
+                # Reduce from macros Remaining for the day
+                found_user.caloriesRemaining = max(0, found_user.caloriesRemaining - calories)
+                found_user.proteinRemaining = max(0, found_user.proteinRemaining - protein)
+                found_user.carbRemaining = max(0, found_user.carbRemaining - carbs)
+                found_user.fatRemaining = max(0, found_user.fatRemaining - fat)
+
+                # Save meal selection to UserMeals table
+                user_meal = UserMeals(user_id=found_user.id, 
+                                      meal_id=selected_meal.id, 
+                                      amount=amount, 
+                                      calories=calories, 
+                                      protein=protein, 
+                                      carbs=carbs, 
+                                      fat=fat
+                                      )
+                db.session.add(user_meal)
+                db.session.commit()
+
+                flash(f"Added {amount}g of {selected_meal.food_name} ({calories:.2f} kcal, {protein:.2f}g protein, {carbs:.2f}g carbs, {fat:.2f}g fat) to your meals!", "success")
+                flash(f"Remaining: {found_user.caloriesRemaining:.2f} kcal", "success")
+                return redirect(url_for('meals'))  # Refresh the page
+                
             else:
                 flash("Meal data is missing or invalid. Please try again.", "error")
-                return redirect(url_for('meals'))
 
-            # Save meal selection to UserMeals table
-            user_meal = UserMeals(user_id=found_user.id, meal_id=selected_meal.id, amount=amount, calories=calories, protein=protein, carbs=carbs, fat=fat)
-            db.session.add(user_meal)
-            db.session.commit()
-
-            flash(f"Added {amount}g of {selected_meal.food_name} ({calories:.2f} kcal, {protein:.2f}g protein, {carbs:.2f}g carbs, {fat:.2f}g fat) to your meals!", "success")
-            return redirect(url_for('meals'))  # Refresh the page
-
-        else:
-            flash("Please select a meal before submitting.", "error")
-
-    return render_template('meals.html', meals_list=meals_list, user_meals=user_meals, user_db=found_user)
+    return render_template('meals.html', 
+                           meals_list=meals_list, 
+                           user_meals=user_meals, 
+                           user_db=found_user, 
+                           goal_messages=goal_messages
+                           )
 
 
 # Goals page
