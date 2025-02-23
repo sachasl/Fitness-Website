@@ -2,6 +2,7 @@
 <html lang="en">
 
 <head>
+    <!-- Initialise the file details and link CSS file -->
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Fitness App</title>
@@ -9,6 +10,7 @@
     
 
 <body>
+    <!-- Dispaly Navbar -->
     <nav class="navbar">
         <ul class="navbar_items">
             <li>
@@ -35,14 +37,17 @@
         </ul>
     </nav>
 
+    <!-- Display Header-->
     <header>
         {% block title %}  {% endblock %}
     </header>
 
+    <!-- Display Content -->
     <main>
         {% block content %}  {% endblock %}
     </main>
 
+    <!-- Display Footer -->
     <footer>
         {% block footer %}  {% endblock %}
     </footer>

@@ -24,7 +24,8 @@
             <li><strong>Goal:</strong> {{ user_db.goal if user_db.goal else 'Not Set' }}</li>
             <li><strong>Intensity:</strong> {{ user_db.intensity if user_db.intensity else 'Not Set' }}</li>
         </ul>
-
+        
+        <!-- Display User Goals -->
         <h3>Your Goals</h3>
         <ul class="user-list">
             <li><strong>Calorie Requirement:</strong> {{ user_db.caloriesRequired if user_db.caloriesRequired else 'Not Set' }} kcal/day</li>
@@ -113,9 +114,9 @@
                     <span class="custom-radio"></span> Super Active (Athlete or Intense Training)
                 </label>
             </div>
-
-            <br>
+            
             <!-- Gender Toggle -->
+            <h3>Gender</h3><br>
             <label class="switch">
                 <input type="checkbox" id="genderToggle" name="gender" value="female"
                        {% if gender == 'female' %}checked{% endif %} 
@@ -126,16 +127,7 @@
     
             <!-- Single Submit Button -->
             <button type="submit" name="action" value="updateDetails">Save Changes</button>
-        </form>
-    
-        <!-- Script to actively change gender toggle indication-->
-        <script>
-            function updateGenderText() {
-                const genderText = document.getElementById("genderText");
-                const genderToggle = document.getElementById("genderToggle");
-                genderText.textContent = genderToggle.checked ? "Female" : "Male";
-            }
-        </script>        
+        </form>      
     
         <!-- Flash Messages -->
         {% with messages = get_flashed_messages(with_categories=True) %}
@@ -147,4 +139,20 @@
         {% endwith %}
     </div>    
 </div>
+
+<!-- Script to actively change gender toggle indication-->
+<script>
+    function updateGenderText() {
+        // Get the text element where the gender will be displayed
+        const genderText = document.getElementById("genderText");
+        
+        // Get the toggle switch element
+        const genderToggle = document.getElementById("genderToggle");
+
+        // Update the text content based on the toggle's checked state
+        // If checked, display "Female", otherwise display "Male"
+        genderText.textContent = genderToggle.checked ? "Female" : "Male";
+    }
+</script>  
+
 {% endblock %}

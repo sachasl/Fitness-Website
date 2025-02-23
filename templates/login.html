@@ -1,16 +1,19 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <!-- Initialise the file details and link CSS file -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='login.css') }}">
 </head>
-<body>
 
+<body>
     <div class="login-container">
         <div class="section-box">
             <h1>Hello guest, let's get you logged in!</h1>
+
+            <!-- Login Form -->
             <form action="{{ url_for('login') }}" method="POST">
                 <p>Name:</p>
                 <p>
@@ -24,7 +27,8 @@
                 </p>
                 <p><input type="submit" value="Submit"></p>
             </form>
-
+            
+            <!-- Display Flash Messages -->
             {% with messages = get_flashed_messages(with_categories=True) %}
                 {% if messages %}
                     {% for category, msg in messages %}

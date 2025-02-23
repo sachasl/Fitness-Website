@@ -188,6 +188,7 @@ input[type="range"]::-webkit-slider-thumb {
   cursor: pointer;
 }
 
+/* Range Slider Thumb for alternate browsers */
 input[type="range"]::-moz-range-thumb {
   width: 15px;
   height: 15px;
@@ -403,6 +404,7 @@ input:checked + .slider:before {
   transition: 0.3s ease-in-out;
 }
 
+/* Search Input Field Hover Effect */
 #meal-search:focus {
   border-color: #1a98b4;
   box-shadow: 0 0 0.3125rem rgba(46, 210, 238, 0.5);
@@ -422,6 +424,7 @@ input:checked + .slider:before {
   transition: 0.3s ease-in-out;
 }
 
+/* Select Dropdown Hover Effect */
 #meal_id:hover {
   border-color: #1a98b4;
 }
@@ -467,7 +470,7 @@ th, td {
   border-bottom: 2px solid #ddd;
 }
 
-/* Header Styling */
+/* Table Header Styling */
 th {
   background-color: #2ed2ee;
   color: white;
@@ -478,7 +481,7 @@ tr:nth-child(even) {
   background-color: #f2f2f2;
 }
 
-/* Hover Effect */
+/* Table Hover Effect */
 tr:hover {
   background-color: #e3f7fc;
   transition: 0.3s ease-in-out;

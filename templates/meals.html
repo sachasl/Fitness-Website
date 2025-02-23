@@ -24,7 +24,7 @@
                 {% endfor %}
             </select>
             <br><br>
-            <!-- Amount Input Field -->
+            <!-- Amount (of meal in grams) Input Field -->
             <label for="amount">Enter Amount (grams):</label>
             <input type="number" name="amount" id="amount" min="1" value="100" required>
 
@@ -41,6 +41,7 @@
         {% endwith %}
     </div>
 
+    <!-- Display User Goals -->
     <div class="section-box">
         <h3>Today's Remaining Macros</h3>
         <ul class="user-list">
@@ -58,9 +59,9 @@
         {% endif %}
     </div>
 
+    <!-- Display Meals Consumed Today -->
     <div class="section-box">
         <h1>Today's Meals</h1>
-
         {% if user_meals %}
             <table>
                 <thead>
@@ -96,19 +97,31 @@
 <script>
     function filterMeals() {
         var input, filter, select, options, option, i;
+
+        // Get the search input field
         input = document.getElementById("meal-search");
+
+        // Convert the search input to lowercase for case-insensitive comparison
         filter = input.value.toLowerCase();
+
+        // Get the dropdown list of meals
         select = document.getElementById("meal_id");
+
+        // Get all option elements inside the dropdown
         options = select.getElementsByTagName("option");
 
-        for (i = 1; i < options.length; i++) { // Skip first disabled option
+        // Loop through all options, starting from index 1 to skip the first disabled option
+        for (i = 1; i < options.length; i++) { 
             option = options[i];
+
+            // Check if the option text includes the search filter
             if (option.textContent.toLowerCase().includes(filter)) {
-                option.style.display = "";
+                option.style.display = ""; // Show the option if it matches
             } else {
-                option.style.display = "none";
+                option.style.display = "none"; // Hide the option if it doesn't match
             }
         }
     }
 </script>
+
 {% endblock %}

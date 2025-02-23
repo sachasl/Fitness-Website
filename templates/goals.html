@@ -8,9 +8,10 @@
 <div class="content">
     <div class="section-box">
         <h1>Calculate Your Fitness Goals</h1>
+        <!-- Goal Selection Form -->
         <form method="POST" action="/goals">
-            
-            <!-- Goal Selection -->
+
+            <!-- Goal Selection Radio Buttons-->
             <h3>Select Your Goal:</h3>
             <div class="fitness-goals">
                 <label class="radio-button">
@@ -32,7 +33,7 @@
                 </label>
             </div>
 
-            <!-- Intensity Selection (Only for Deficit or Surplus) -->
+            <!-- Intensity Selection Radio Buttons (Only for Deficit or Surplus) -->
             <div id="intensity-options" class="fitness-goals" style="display: none;">
                 <h3>Select Intensity:</h3>
                 <label class="radio-button">
@@ -72,10 +73,11 @@
 
 
     <div class="section-box">
+        <!-- Display Recommended Macronutrient Ratios -->
         <h1>Macronutrient goals</h1>
         {% if goal %}
-        <h3>Recommended Macronutrient Ratios:</h3>
-        <ul class="user-list">
+            <h3>Recommended Macronutrient Ratios:</h3>
+            <ul class="user-list">
             {% if goal == 'deficit' %}
                 <li><strong>Protein:</strong> 20-30%</li>
                 <li><strong>Fat:</strong> 20-35%</li>
@@ -92,6 +94,8 @@
         </ul>
         {% endif %}
         <br>
+
+        <!-- Macronutrient Ratio Form -->
         <form method="POST" action="/goals">
             <!-- Protein Slider -->
             <label>Protein (%):
@@ -99,21 +103,25 @@
                 <span id="proteinValue">25%</span>
             </label>
             <br>
+
             <!-- Fat Slider -->
             <label>Fat (%):
                 <input type="range" id="fat" name="fat" min="20" max="35" value="30" oninput="updateValues()">
                 <span id="fatValue">30%</span>
             </label>
             <br>
+
             <!-- Carbs Slider -->
             <label>Carbohydrates (%):
                 <input type="range" id="carb" name="carb" min="35" max="60" value="45" oninput="updateValues()">
                 <span id="carbValue">45%</span>
             </label>
+
             <!-- Total Macronutrient Percentage -->
             <p><strong>Total:</strong> <span id="totalValue">100%</span></p>
             <p id="errorMessage" style="color: red; font-weight: bold; display: none;">Total must equal 100%</p>
             <br>
+
             <button type="submit" name="action" value='updateMacros' class="styled-button">Save Goals</button>
         </form>
     </div>
@@ -121,42 +129,54 @@
 
 <!-- JavaScript to Show/Hide Intensity Based on Goal Selection -->
 <script>
+    // Select all radio input elements with the name "goal"
     document.querySelectorAll('input[name="goal"]').forEach(goalRadio => {
+        
+        // Add an event listener to each radio button for the 'change' event
         goalRadio.addEventListener('change', function () {
+            
+            // Get the div element that contains intensity options
             const intensityDiv = document.getElementById("intensity-options");
+
+            // Show the intensity options if 'deficit' or 'surplus' is selected, otherwise hide it
             intensityDiv.style.display = (this.value === 'deficit' || this.value === 'surplus') ? "block" : "none";
         });
     });
 
+
     function updateValues() {
+        // Get the numeric values from the input fields
         let protein = parseInt(document.getElementById("protein").value);
         let fat = parseInt(document.getElementById("fat").value);
         let carb = parseInt(document.getElementById("carb").value);
 
-        // Update individual values
+        // Update the displayed percentage values for each macronutrient
         document.getElementById("proteinValue").innerText = protein + "%";
         document.getElementById("fatValue").innerText = fat + "%";
         document.getElementById("carbValue").innerText = carb + "%";
 
-        // Calculate total
+        // Calculate the total percentage of macronutrients
         let total = protein + fat + carb;
+
+        // Get elements for displaying total and error message
         let totalValueElement = document.getElementById("totalValue");
         let errorMessage = document.getElementById("errorMessage");
 
-        // Update total display
+        // Update the displayed total percentage
         totalValueElement.innerText = total + "%";
 
-        // Check if total is exactly 100%
+        // Check if the total equals 100%
         if (total === 100) {
-            totalValueElement.style.color = "green";
-            errorMessage.style.display = "none";
+            totalValueElement.style.color = "green";  // Indicate success with green color
+            errorMessage.style.display = "none";  // Hide the error message
         } else {
-            totalValueElement.style.color = "red";
-            errorMessage.style.display = "block";
+            totalValueElement.style.color = "red";  // Indicate an error with red color
+            errorMessage.style.display = "block";  // Show the error message
         }
     }
 
-    // Initialize correct display on page load
-    updateValues();
+// Run updateValues() when the page loads to initialize display correctly
+updateValues();
+
 </script>
 {% endblock %}
