@@ -1,47 +1,89 @@
 {% extends "base.html" %}
 
-{% block title %}  
-<h1>Dashboard</h1>
+{% block title %}
+
 {% endblock %}
 
 {% block content %}
 <div class="content">
-    <div class="section-box">
-        <h1>Your Hub</h1>
-        {% with messages = get_flashed_messages() %}
-            {% if messages %}
-                {% for msg in messages %}
-                    <p>{{msg}}</p>
-                {% endfor %}
-            {% endif %}
-        {% endwith %}
-
-    <p>Hello {{username}}!</p>
-    <p>Welcome to your all in one fitness app!</p>
-    </div>
-    <div class="section-box">
-        <h1>Meals</h1>
-    </div>
 
     <div class="section-box">
         <h1>Goals</h1>
-        <p>Your BMI at the current time is: {{ user_db.bmi }}</p>
-    </div>
-
-    <div class="section-box">
-        <h1>Activity</h1>
-        <p>Recent Activity</p>
+        <h3>Your Goals</h3>
+        <ul class="user-list">
+            <li><strong>Calorie Requirement:</strong> {{ user_db.caloriesRequired if user_db.caloriesRequired else 'Not Set' }} kcal/day</li>
+            <li><strong>Protein Requirement:</strong> {{ user_db.proteinRequired if user_db.proteinRequired else 'Not Set' }} g/day</li>
+            <li><strong>Carbohydrate Requirement:</strong> {{ user_db.carbRequired if user_db.carbRequired else 'Not Set' }} g/day</li>
+            <li><strong>Fat Requirement:</strong> {{ user_db.fatRequired if user_db.fatRequired else 'Not Set' }} g/day</li>
+        </ul>
     </div>
 
     <div class="section-box">
         <h1>Calories</h1>
-        <p>Calories Remaining</p>
+        <h3>Today's Remaining Macros</h3>
+        <ul class="user-list">
+            <li><strong>Calories Remaining:</strong> {{ user_db.caloriesRemaining }} kcal</li>
+            <li><strong>Protein Remaining:</strong> {{ user_db.proteinRemaining }} g</li>
+            <li><strong>Fat Remaining:</strong> {{ user_db.fatRemaining }} g</li>
+            <li><strong>Carbs Remaining:</strong> {{ user_db.carbRemaining }} g</li>
+        </ul>
+    </div>
+
+    <div class="section-box">
+        <h1>Meals</h1>
+        <h3>Today's Meals</h3>
+        {% if user_meals %}
+            <table>
+                <thead>
+                    <tr>
+                        <th>Meal Name</th>
+                        <th>Amount (g)</th>
+                        <th>Calories</th>
+                        <th>Protein (g)</th>
+                        <th>Carbs (g)</th>
+                        <th>Fat (g)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for user_meal, meal in user_meals %}
+                    <tr>
+                        <td>{{ meal.food_name }}</td>
+                        <td>{{ user_meal.amount }}</td>
+                        <td>{{ user_meal.calories }}</td>
+                        <td>{{ user_meal.protein }}</td>
+                        <td>{{ user_meal.carbs }}</td>
+                        <td>{{ user_meal.fat }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <p>No meals selected yet.</p>
+        {% endif %}
     </div>
 
     <div class="section-box">
         <h1>Account</h1>
-        <p>You are signed in as: <b>{{username}}</b> !</p>
+        <h3>Hello, {{ user_db.username }}! This is your information</h3>
+        <ul class="user-list">
+            <li><strong>Weight:</strong> {{ user_db.weight if user_db.weight else 90 }} kg</li>
+            <li><strong>Height:</strong> {{ user_db.height if user_db.height else 1.75 }} m</li>
+            <li><strong>Age:</strong> {{ user_db.age if user_db.age else 48 }} years</li>
+            <li><strong>Gender:</strong> {{ user_db.gender if user_db.gender else 'male' }}</li>
+            <li><strong>BMI:</strong> {{ user_db.bmi if user_db.bmi else 'Not Calculated' }}</li>
+            <li><strong>Activity Level:</strong> {{ user_db.exercise_level.replace("_", " ").title() if user_db.exercise_level else 'Not Set' }}</li>
+            <li><strong>Goal:</strong> {{ user_db.goal if user_db.goal else 'Not Set' }}</li>
+            <li><strong>Intensity:</strong> {{ user_db.intensity if user_db.intensity else 'Not Set' }}</li>
+        </ul>
+
+        <!-- Flash Messages -->
+        {% with messages = get_flashed_messages(with_categories=True) %}
+            {% if messages %}
+                {% for category, msg in messages %}
+                    <p class="flash-message {{ category }}">{{ msg }}</p>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
     </div>
 </div>
 {% endblock %}
-

@@ -1,122 +1,122 @@
 {% extends "base.html" %}
 
 {% block title %}  
-<h1>Goals</h1>
+
 {% endblock %}
 
 {% block content %} 
+<div class="content">
+    <div class="section-box">
+        <h1>Calculate Your Fitness Goals</h1>
+        <form method="POST" action="/goals">
+            
+            <!-- Goal Selection -->
+            <h3>Select Your Goal:</h3>
+            <div class="fitness-goals">
+                <label class="radio-button">
+                    <input type="radio" name="goal" value="deficit" required 
+                        {% if goal == 'deficit' %}checked{% endif %}>
+                    <span class="custom-radio"></span> Lose Weight (Calorie Deficit)
+                </label>
 
-<div class="section-box">
-    <h1>Calculate Your Fitness Goals</h1>
-    <form method="POST" action="/goals">
-        
-        <!-- Goal Selection -->
-        <h3>Select Your Goal:</h3>
-        <div class="fitness-goals">
-            <label class="radio-button">
-                <input type="radio" name="goal" value="deficit" required 
-                       {% if goal == 'deficit' %}checked{% endif %}>
-                <span class="custom-radio"></span> Lose Weight (Calorie Deficit)
-            </label>
+                <label class="radio-button">
+                    <input type="radio" name="goal" value="maintain" required 
+                        {% if goal == 'maintain' %}checked{% endif %}>
+                    <span class="custom-radio"></span> Maintain Weight
+                </label>
 
-            <label class="radio-button">
-                <input type="radio" name="goal" value="maintain" required 
-                       {% if goal == 'maintain' %}checked{% endif %}>
-                <span class="custom-radio"></span> Maintain Weight
-            </label>
+                <label class="radio-button">
+                    <input type="radio" name="goal" value="surplus" required 
+                        {% if goal == 'surplus' %}checked{% endif %}>
+                    <span class="custom-radio"></span> Gain Weight (Calorie Surplus)
+                </label>
+            </div>
 
-            <label class="radio-button">
-                <input type="radio" name="goal" value="surplus" required 
-                       {% if goal == 'surplus' %}checked{% endif %}>
-                <span class="custom-radio"></span> Gain Weight (Calorie Surplus)
-            </label>
-        </div>
+            <!-- Intensity Selection (Only for Deficit or Surplus) -->
+            <div id="intensity-options" class="fitness-goals" style="display: none;">
+                <h3>Select Intensity:</h3>
+                <label class="radio-button">
+                    <input type="radio" name="intensity" value="mild" 
+                        {% if intensity == 'mild' %}checked{% endif %}>
+                    <span class="custom-radio"></span> Mild
+                </label><br>
 
-        <!-- Intensity Selection (Only for Deficit or Surplus) -->
-        <div id="intensity-options" class="fitness-goals" style="display: none;">
-            <h3>Select Intensity:</h3>
-            <label class="radio-button">
-                <input type="radio" name="intensity" value="mild" 
-                       {% if intensity == 'mild' %}checked{% endif %}>
-                <span class="custom-radio"></span> Mild
-            </label><br>
+                <label class="radio-button">
+                    <input type="radio" name="intensity" value="moderate" 
+                        {% if intensity == 'moderate' %}checked{% endif %}>
+                    <span class="custom-radio"></span> Moderate
+                </label><br>
 
-            <label class="radio-button">
-                <input type="radio" name="intensity" value="moderate" 
-                       {% if intensity == 'moderate' %}checked{% endif %}>
-                <span class="custom-radio"></span> Moderate
-            </label><br>
+                <label class="radio-button">
+                    <input type="radio" name="intensity" value="extreme" 
+                        {% if intensity == 'extreme' %}checked{% endif %}>
+                    <span class="custom-radio"></span> Extreme
+                </label><br>
+            </div>
 
-            <label class="radio-button">
-                <input type="radio" name="intensity" value="extreme" 
-                       {% if intensity == 'extreme' %}checked{% endif %}>
-                <span class="custom-radio"></span> Extreme
-            </label><br>
-        </div>
+            <!-- Submit Button -->
+            <button type="submit" name="action" value='updateGoals' class="styled-button">Calculate</button>
+        </form>
 
-        <!-- Submit Button -->
-        <button type="submit" name="action" value='updateGoals' class="styled-button">Calculate</button>
-    </form>
+        <!-- Flash Messages -->
+        {% with messages = get_flashed_messages(with_categories=True) %}
+            {% if messages %}
+                {% for category, msg in messages %}
+                    <p class="flash-message {{ category }}">{{ msg }}</p>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
 
-    <!-- Flash Messages -->
-    {% with messages = get_flashed_messages(with_categories=True) %}
-        {% if messages %}
-            {% for category, msg in messages %}
-                <p class="flash-message {{ category }}">{{ msg }}</p>
-            {% endfor %}
+    </div>
+
+
+
+    <div class="section-box">
+        <h1>Macronutrient goals</h1>
+        {% if goal %}
+        <h3>Recommended Macronutrient Ratios:</h3>
+        <ul class="user-list">
+            {% if goal == 'deficit' %}
+                <li><strong>Protein:</strong> 20-30%</li>
+                <li><strong>Fat:</strong> 20-35%</li>
+                <li><strong>Carbohydrates:</strong> 45-60%</li>
+            {% elif goal == 'maintain' %}
+                <li><strong>Protein:</strong> 25-35%</li>
+                <li><strong>Fat:</strong> 20-30%</li>
+                <li><strong>Carbohydrates:</strong> 35-50%</li>
+            {% elif goal == 'surplus' %}
+                <li><strong>Protein:</strong> 25-30%</li>
+                <li><strong>Fat:</strong> 20-25%</li>
+                <li><strong>Carbohydrates:</strong> 45-55%</li>
+            {% endif %}
+        </ul>
         {% endif %}
-    {% endwith %}
-
-</div>
-
-
-
-<div class="section-box">
-    <h1>Macronutrient goals</h1>
-    {% if goal %}
-    <h3>Recommended Macronutrient Ratios:</h3>
-    <ul class="user-list">
-        {% if goal == 'deficit' %}
-            <li><strong>Protein:</strong> 20-30%</li>
-            <li><strong>Fat:</strong> 20-35%</li>
-            <li><strong>Carbohydrates:</strong> 45-60%</li>
-        {% elif goal == 'maintain' %}
-            <li><strong>Protein:</strong> 25-35%</li>
-            <li><strong>Fat:</strong> 20-30%</li>
-            <li><strong>Carbohydrates:</strong> 35-50%</li>
-        {% elif goal == 'surplus' %}
-            <li><strong>Protein:</strong> 25-30%</li>
-            <li><strong>Fat:</strong> 20-25%</li>
-            <li><strong>Carbohydrates:</strong> 45-55%</li>
-        {% endif %}
-    </ul>
-    {% endif %}
-    <br>
-    <form method="POST" action="/goals">
-        <!-- Protein Slider -->
-        <label>Protein (%):
-            <input type="range" id="protein" name="protein" min="20" max="35" value="25" oninput="updateValues()">
-            <span id="proteinValue">25%</span>
-        </label>
         <br>
-        <!-- Fat Slider -->
-        <label>Fat (%):
-            <input type="range" id="fat" name="fat" min="20" max="35" value="30" oninput="updateValues()">
-            <span id="fatValue">30%</span>
-        </label>
-        <br>
-        <!-- Carbs Slider -->
-        <label>Carbohydrates (%):
-            <input type="range" id="carb" name="carb" min="35" max="60" value="45" oninput="updateValues()">
-            <span id="carbValue">45%</span>
-        </label>
-        <br>
-        <!-- Total Macronutrient Percentage -->
-        <p><strong>Total:</strong> <span id="totalValue">100%</span></p>
-        <p id="errorMessage" style="color: red; font-weight: bold; display: none;">Total must equal 100%</p>
-        <br>
-        <button type="submit" name="action" value='updateMacros' class="styled-button">Save Goals</button>
-    </form>
+        <form method="POST" action="/goals">
+            <!-- Protein Slider -->
+            <label>Protein (%):
+                <input type="range" id="protein" name="protein" min="20" max="35" value="25" oninput="updateValues()">
+                <span id="proteinValue">25%</span>
+            </label>
+            <br>
+            <!-- Fat Slider -->
+            <label>Fat (%):
+                <input type="range" id="fat" name="fat" min="20" max="35" value="30" oninput="updateValues()">
+                <span id="fatValue">30%</span>
+            </label>
+            <br>
+            <!-- Carbs Slider -->
+            <label>Carbohydrates (%):
+                <input type="range" id="carb" name="carb" min="35" max="60" value="45" oninput="updateValues()">
+                <span id="carbValue">45%</span>
+            </label>
+            <!-- Total Macronutrient Percentage -->
+            <p><strong>Total:</strong> <span id="totalValue">100%</span></p>
+            <p id="errorMessage" style="color: red; font-weight: bold; display: none;">Total must equal 100%</p>
+            <br>
+            <button type="submit" name="action" value='updateMacros' class="styled-button">Save Goals</button>
+        </form>
+    </div>
 </div>
 
 <!-- JavaScript to Show/Hide Intensity Based on Goal Selection -->
@@ -159,5 +159,4 @@
     // Initialize correct display on page load
     updateValues();
 </script>
-
 {% endblock %}

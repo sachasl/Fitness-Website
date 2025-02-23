@@ -1,61 +1,95 @@
 {% extends "base.html" %}
 
 {% block title %}  
-<h1>Meals</h1>
+
 {% endblock %}
 
 {% block content %} 
+<div class="content">
+    <div class="section-box">
+        <h1>Select Your Meals</h1>
+        <!-- Form to add meal -->
+        <form method="POST" action="/meals">
+            
+            <!-- Searchable Dropdown -->
+            <label for="meal-search">Filter to select a Meal:</label>
+            <input type="text" id="meal-search" onkeyup="filterMeals()" placeholder="Type to search...">
+            <br>
+            <!-- Meal Dropdown -->
+            <label for="meal_id">Select a Meal:</label>
+            <select name="meal_id" id="meal_id" required>
+                <option value="" disabled selected>Choose a meal</option>
+                {% for meal in meals_list %}
+                    <option value="{{ meal.id }}">{{ meal.food_name }} - {{ meal.calories }} kcal per {{meal.grams}} grams</option>
+                {% endfor %}
+            </select>
+            <br><br>
+            <!-- Amount Input Field -->
+            <label for="amount">Enter Amount (grams):</label>
+            <input type="number" name="amount" id="amount" min="1" value="100" required>
 
-<div class="section-box">
-    <h1>Select Your Meals</h1>
-    <!-- Form to add meal -->
-    <form method="POST" action="/meals">
-        
-        <!-- Searchable Dropdown -->
-        <label for="meal-search">Filter to select a Meal:</label>
-        <input type="text" id="meal-search" onkeyup="filterMeals()" placeholder="Type to search...">
-        <br>
-        <!-- Meal Dropdown -->
-        <label for="meal_id">Select a Meal:</label>
-        <select name="meal_id" id="meal_id" required>
-            <option value="" disabled selected>Choose a meal</option>
-            {% for meal in meals_list %}
-                <option value="{{ meal.id }}">{{ meal.food_name }} - {{ meal.calories }} kcal per {{meal.grams}} grams</option>
-            {% endfor %}
-        </select>
-        <br>
-        <!-- Amount Input Field -->
-        <label for="amount">Enter Amount (grams):</label>
-        <input type="number" name="amount" id="amount" min="1" value="100" required>
+            <button type="submit" class="styled-button">Add Meal</button>
+        </form>
 
-        <button type="submit" class="styled-button">Add Meal</button>
-    </form>
+        <!-- Display Flash Messages -->
+        {% with messages = get_flashed_messages(with_categories=True) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <p class="flash-message {{ category }}">{{ message }}</p>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+    </div>
 
-    <!-- Display Flash Messages -->
-    {% with messages = get_flashed_messages(with_categories=True) %}
-        {% if messages %}
-            {% for category, message in messages %}
-                <p class="flash-message {{ category }}">{{ message }}</p>
+    <div class="section-box">
+        <h3>Today's Remaining Macros</h3>
+        <ul class="user-list">
+            <li><strong>Calories Remaining:</strong> {{ user_db.caloriesRemaining }} kcal</li>
+            <li><strong>Protein Remaining:</strong> {{ user_db.proteinRemaining }} g</li>
+            <li><strong>Fat Remaining:</strong> {{ user_db.fatRemaining }} g</li>
+            <li><strong>Carbs Remaining:</strong> {{ user_db.carbRemaining }} g</li>
+        </ul>
+
+        <!-- Display Goal Achievement Messages -->
+        {% if goal_messages %}
+            {% for message in goal_messages %}
+                <p class="flash-message success">{{ message }}</p>
             {% endfor %}
         {% endif %}
-    {% endwith %}
-</div>
+    </div>
 
-<div class="section-box">
-    <h2>Today's Remaining Macros</h2>
-    <ul class="user-list">
-        <li><strong>Calories Remaining:</strong> {{ user_db.caloriesRemaining }} kcal</li>
-        <li><strong>Protein Remaining:</strong> {{ user_db.proteinRemaining }} g</li>
-        <li><strong>Fat Remaining:</strong> {{ user_db.fatRemaining }} g</li>
-        <li><strong>Carbs Remaining:</strong> {{ user_db.carbRemaining }} g</li>
-    </ul>
+    <div class="section-box">
+        <h1>Today's Meals</h1>
 
-    <!-- Display Goal Achievement Messages -->
-    {% if goal_messages %}
-        {% for message in goal_messages %}
-            <p class="flash-message success">{{ message }}</p>
-        {% endfor %}
-    {% endif %}
+        {% if user_meals %}
+            <table>
+                <thead>
+                    <tr>
+                        <th>Meal Name</th>
+                        <th>Amount (g)</th>
+                        <th>Calories</th>
+                        <th>Protein (g)</th>
+                        <th>Carbs (g)</th>
+                        <th>Fat (g)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for user_meal, meal in user_meals %}
+                    <tr>
+                        <td>{{ meal.food_name }}</td>
+                        <td>{{ user_meal.amount }}</td>
+                        <td>{{ user_meal.calories }}</td>
+                        <td>{{ user_meal.protein }}</td>
+                        <td>{{ user_meal.carbs }}</td>
+                        <td>{{ user_meal.fat }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <p>No meals selected yet.</p>
+        {% endif %}
+    </div>
 </div>
 
 <!-- JavaScript for Searchable Dropdown -->
@@ -77,38 +111,4 @@
         }
     }
 </script>
-
-<div class="section-box">
-    <h1>Today's Meals</h1>
-
-    {% if user_meals %}
-        <table>
-            <thead>
-                <tr>
-                    <th>Meal Name</th>
-                    <th>Amount (g)</th>
-                    <th>Calories</th>
-                    <th>Protein (g)</th>
-                    <th>Carbs (g)</th>
-                    <th>Fat (g)</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for user_meal, meal in user_meals %}
-                <tr>
-                    <td>{{ meal.food_name }}</td>
-                    <td>{{ user_meal.amount }}</td>
-                    <td>{{ user_meal.calories }}</td>
-                    <td>{{ user_meal.protein }}</td>
-                    <td>{{ user_meal.carbs }}</td>
-                    <td>{{ user_meal.fat }}</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    {% else %}
-        <p>No meals selected yet.</p>
-    {% endif %}
-</div>
-
 {% endblock %}

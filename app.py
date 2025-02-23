@@ -209,9 +209,25 @@ def dashboard():
     if not user_details_complete(found_user):
         flash("Please complete your account details before using the program.", "warning")
         return redirect(url_for('account'))
+    
+    # Get today's date in UTC
+    today = datetime.now(timezone.utc).date()
+
+    # Query to get user's meals for today
+    user_meals = (
+        db.session.query(UserMeals, Meal)
+        .join(Meal)
+        .filter(UserMeals.user_id == found_user.id)
+        .filter(UserMeals.date_added >= today)
+        .all()
+    )
 
     # Render the dashboard page with the logged-in user's information
-    return render_template('dashboard.html', username=username, user_db=found_user)
+    return render_template('dashboard.html', 
+                           username=username, 
+                           user_db=found_user,
+                           user_meals=user_meals
+                           )
 
 # Meals page
 @app.route('/meals', methods=['POST', 'GET'])
