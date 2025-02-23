@@ -321,7 +321,6 @@ def meals():
                            goal_messages=goal_messages
                            )
 
-
 # Goals page
 @app.route('/goals', methods=['POST', 'GET'])
 def goals():
