@@ -79,16 +79,30 @@ input[type="submit"]:hover {
     box-shadow: 0 0.2rem 0.5rem rgba(0, 0, 0, 0.2);
 }
 
-/* Flash Messages */
+/* Flash Message Styling */
 .flash-message {
-    background-color: lightcoral;
-    color: white;
     padding: 0.75rem;
     border-radius: 0.5rem;
     margin-top: 1rem;
     width: 90%;
     text-align: center;
     font-weight: bold;
+    box-shadow: 0 0.2rem 0.5rem rgba(0, 0, 0, 0.2);
+    color: white;
+    background-size: 200% auto;
+    transition: all 0.4s ease-in-out;
+    animation: gradientAnimation 3s infinite alternate;
+}
+  
+/* Success Message */
+.flash-message.success {
+    background: linear-gradient(45deg, #38b000, #2a9d8f);
+}
+
+/* Smooth Gradient Animation */
+@keyframes gradientAnimation {
+    0% { background-position: 0% 50%; }
+    100% { background-position: 100% 50%; }
 }
 
 /* Responsive Design */

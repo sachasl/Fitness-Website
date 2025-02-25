@@ -57,7 +57,7 @@
     
         <form method="POST" action="/account">
             <!-- Weight Slider -->
-            <h3>Weight</h3>
+            <h3>Weight</h3><br>
             <input type="range" id="weightSlider" name="getWeight" min="40" max="140" step="1" 
                 value="{{ user_db.weight if user_db.weight else 70 }}"
                 oninput="weightOutput.value = this.value">
@@ -65,7 +65,7 @@
             <br>
 
             <!-- Height Slider -->
-            <h3>Height</h3>
+            <h3>Height</h3><br>
             <input type="range" id="heightSlider" name="getHeight" min="1.50" max="2.00" step="0.01" 
                 value="{{ user_db.height if user_db.height else 1.75 }}" 
                 oninput="heightOutput.value = this.value">
