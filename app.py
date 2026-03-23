@@ -305,8 +305,7 @@ def meals():
 
                 # Flash success messages to inform the user about the added meal and its nutritional values
                 flash(f"Added {amount}g of {selected_meal.food_name}  to your meals!", "success")
-                flash(f"Your meal included: {calories:.2f} kcal, {protein:.2f}g protein, 
-                      {carbs:.2f}g carbs, {fat:.2f}g fat", "success")
+                flash(f"Your meal included: {calories:.2f} kcal, {protein:.2f}g protein, {carbs:.2f}g carbs, {fat:.2f}g fat", "success")
                 # Refresh the page
                 return redirect(url_for('meals'))  
                 
@@ -416,8 +415,7 @@ def goals():
             db.session.commit()
 
             # Confirm macronutrient goals update and reload page
-            flash(f"Macronutrient goals updated: {protein_grams:.1f}g protein, 
-                  {fat_grams:.1f}g fat, {carb_grams:.1f}g carbs", "success")
+            flash(f"Macronutrient goals updated: {protein_grams:.1f}g protein, {fat_grams:.1f}g fat, {carb_grams:.1f}g carbs", "success")
             return redirect(url_for('goals'))
 
     # Render the goals page with the user's current goal
